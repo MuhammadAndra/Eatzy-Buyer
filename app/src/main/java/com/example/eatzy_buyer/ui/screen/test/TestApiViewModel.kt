@@ -36,7 +36,6 @@ class TestApiViewModel: ViewModel(){
                     ) {
                         //kalo requestnya gagal kesini
                     }
-
                 }
             )
         }
