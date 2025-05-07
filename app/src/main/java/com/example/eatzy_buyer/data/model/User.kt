@@ -2,6 +2,6 @@ package com.example.eatzy_buyer.data.model
 
 data class User(
     //contoh dataclass silahkan edit jika perlu
-    val name:String="",
-    val email:String="",
+    val name:String,
+    val email:String,
 )

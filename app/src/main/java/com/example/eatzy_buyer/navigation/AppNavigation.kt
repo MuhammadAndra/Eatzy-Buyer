@@ -7,6 +7,7 @@ import com.example.eatzy_buyer.navigation.navGraph.Home
 import com.example.eatzy_buyer.navigation.navGraph.authGraph
 import com.example.eatzy_buyer.navigation.navGraph.homeGraph
 import com.example.eatzy_buyer.navigation.navGraph.mainGraph
+import com.example.eatzy_buyer.navigation.navGraph.menuGraph
 import com.example.eatzy_buyer.navigation.navGraph.testGraph
 
 
@@ -18,5 +19,6 @@ fun AppNavigation() {
         homeGraph(navController)
         testGraph(navController)
         mainGraph(navController)
+        menuGraph(navController)
     }
 }

@@ -18,6 +18,6 @@ fun NavGraphBuilder.homeGraph(navController: NavController) {
 
     }
     composable<Canteen> {
-        CanteenScreen(onNavigateToLogin = { navController.navigate(Login) })
+        CanteenScreen(onNavigateToLogin = { navController.navigate(Login) },)
     }
 }

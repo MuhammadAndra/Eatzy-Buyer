@@ -12,29 +12,41 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 object Home
+
 @Serializable
 object History
+
 @Serializable
 object Cart
+
 @Serializable
 object Favorite
+
 @Serializable
 object Profile
 
 fun NavGraphBuilder.mainGraph(navController: NavController) {
-    composable<Home>{
-        HomeScreen(navController = navController)
+    composable<Home> {
+        HomeScreen(
+            navController = navController,
+            onNavigateToSearchScreen = { navController.navigate(Search) },
+            onNavigateToListMenuScreen = { canteenId ->
+                navController.navigate(
+                    ListMenu(canteenId = canteenId)
+                )
+            }
+        )
     }
-    composable<History>{
+    composable<History> {
         HistoryScreen(navController = navController)
     }
-    composable<Cart>{
+    composable<Cart> {
         CartScreen(navController = navController)
     }
-    composable<Favorite>{
+    composable<Favorite> {
         FavoriteScreen(navController = navController)
     }
-    composable<Profile>{
+    composable<Profile> {
         ProfileScreen(navController = navController)
     }
 }
