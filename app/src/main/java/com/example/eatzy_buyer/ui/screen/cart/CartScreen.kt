@@ -2,21 +2,28 @@ package com.example.eatzy_buyer.ui.screen.cart
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import com.example.eatzy_buyer.navigation.navGraph.Home
 import com.example.eatzy_buyer.ui.components.BottomNavBar
 
 
 @Composable
-fun CartScreen(modifier: Modifier = Modifier, navController: NavController) {
+fun CartScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    onNavigateToMyOrder: () -> Unit
+) {
     Scaffold(bottomBar = { BottomNavBar(navController) }) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             Text("Cart")
-
+            Button(onClick = onNavigateToMyOrder) {
+                Text("Order")
+            }
         }
-
     }
 }

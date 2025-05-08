@@ -5,8 +5,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.eatzy_buyer.ui.screen.cart.CartScreen
 import com.example.eatzy_buyer.ui.screen.favorite.FavoriteScreen
-import com.example.eatzy_buyer.ui.screen.history.HistoryScreen
 import com.example.eatzy_buyer.ui.screen.home.HomeScreen
+import com.example.eatzy_buyer.ui.screen.history.HistoryScreen
 import com.example.eatzy_buyer.ui.screen.profile.ProfileScreen
 import kotlinx.serialization.Serializable
 
@@ -26,10 +26,16 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         HomeScreen(navController = navController)
     }
     composable<History>{
-        HistoryScreen(navController = navController)
+        HistoryScreen(
+            navController = navController,
+            onNavigateToMyOrder = { navController.navigate(MyOrder) }
+        )
     }
     composable<Cart>{
-        CartScreen(navController = navController)
+        CartScreen(
+            navController = navController,
+            onNavigateToMyOrder = { navController.navigate(MyOrder) }
+        )
     }
     composable<Favorite>{
         FavoriteScreen(navController = navController)

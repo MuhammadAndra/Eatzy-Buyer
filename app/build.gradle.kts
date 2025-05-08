@@ -66,6 +66,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose-android:2.8.7")
     implementation("androidx.compose.material:material-icons-extended-android:1.7.8")
 
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
