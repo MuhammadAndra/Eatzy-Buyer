@@ -1,8 +1,8 @@
 package com.example.eatzy_buyer.data.model
 
-data class Addon(
+data class AddOn(
     val id: Int,
     val menuId: Int,
-    val addonName: String,
-    val addonPrice: Double
+    val name: String,
+    val price: Double
 )

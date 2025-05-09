@@ -5,5 +5,5 @@ data class OrderItem(
     val orderId: Int,
     val menu: Menu,
     val details: String,
-    val addons: List<Addon>,
+    val addOns: List<AddOn>,
 )

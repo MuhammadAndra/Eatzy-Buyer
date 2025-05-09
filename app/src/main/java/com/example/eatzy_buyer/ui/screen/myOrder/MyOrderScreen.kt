@@ -46,11 +46,12 @@ import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
-import com.example.eatzy_buyer.data.model.Addon
+import com.example.eatzy_buyer.data.model.AddOn
 import com.example.eatzy_buyer.data.model.Canteen
 import com.example.eatzy_buyer.data.model.Menu
 import com.example.eatzy_buyer.data.model.Order
 import com.example.eatzy_buyer.data.model.OrderItem
+import com.example.eatzy_buyer.data.model.OrderStatus
 import com.example.eatzy_buyer.ui.components.BottomNavBar
 import java.text.NumberFormat
 import java.util.Locale
@@ -66,9 +67,9 @@ private val exampleOrders = Order(
         id = 1,
         name = "Kantin Pak Muklis"
     ),
-    orderStatus = "waiting",
+    status = OrderStatus.WAITING,
     orderTime = "2025-05-06 14:23:45",
-    orderFinishedTime = "2025-05-06 14:23:45",
+    finishedTime = "2025-05-06 14:23:45",
     scheduleTime = "2025-05-06 14:23:45",
     estimationTime = 5,
     totalPrice = 12000.0,
@@ -80,23 +81,24 @@ private val exampleOrders = Order(
             menu = Menu(
                 id = 1,
                 name = "Ayam mbakar wong soloz Ayam mbakar wong soloz",
-                preparationTime = "14:23:45",
-                menuImage = "https://foodish-api.com/images/pizza/pizza46.jpg",
+                preparationTime = 4,
+                imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
                 isAvailable = true,
+                addOnCategoryId = emptyList(),
                 menuPrice = 5000.00
             ),
-            addons = listOf(
-                Addon(
+            addOns = listOf(
+                AddOn(
                     id = 1,
                     menuId = 1,
-                    addonName = "Mendoan",
-                    addonPrice = 12000.00
+                    name = "Mendoan",
+                    price = 12000.00
                 ),
-                Addon(
+                AddOn(
                     id = 2,
                     menuId = 1,
-                    addonName = "Cabe",
-                    addonPrice = 12000.00
+                    name = "Cabe",
+                    price = 12000.00
                 ),
             )
         ),
@@ -107,23 +109,24 @@ private val exampleOrders = Order(
             menu = Menu(
                 id = 2,
                 name = "Pecel lele",
-                preparationTime = "14:23:45",
-                menuImage = "https://foodish-api.com/images/pizza/pizza46.jpg",
+                preparationTime = 7,
+                imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
                 isAvailable = true,
+                addOnCategoryId = emptyList(),
                 menuPrice = 5000.00
             ),
-            addons = listOf(
-                Addon(
+            addOns = listOf(
+                AddOn(
                     id = 1,
                     menuId = 2,
-                    addonName = "Mendoan",
-                    addonPrice = 12000.00
+                    name = "Mendoan",
+                    price = 12000.00
                 ),
-                Addon(
+                AddOn(
                     id = 2,
                     menuId = 2,
-                    addonName = "Cabe",
-                    addonPrice = 12000.00
+                    name = "Cabe",
+                    price = 12000.00
                 ),
             )
         ),
@@ -132,18 +135,18 @@ private val exampleOrders = Order(
 
 private val orders = exampleOrders;
 
-val statusMessage = when (orders.orderStatus) {
-    "canceled" -> "Pesanan Dibatalkan Oleh Penjual"
-    "waiting" -> "Menunggu Konfirmasi Penjual"
-    "processing" -> "Pesanan Diproses"
-    "finished" -> "Pesanan Selesai"
+val statusMessage = when (orders.status) {
+    OrderStatus.CANCELED -> "Pesanan Dibatalkan Oleh Penjual"
+    OrderStatus.WAITING -> "Menunggu Konfirmasi Penjual"
+    OrderStatus.PROCESSING -> "Pesanan Diproses"
+    OrderStatus.FINISHED -> "Pesanan Selesai"
     else -> "Order status tidak diketahui"
 }
 
-val statusProgress = when (orders.orderStatus) {
-    "waiting" -> 1
-    "processing" -> 2
-    "finished" -> 3
+val statusProgress = when (orders.status) {
+    OrderStatus.WAITING -> 1
+    OrderStatus.PROCESSING -> 2
+    OrderStatus.FINISHED -> 3
     else -> 0
 }
 
@@ -282,7 +285,7 @@ fun MyOrderItem(orderItem: OrderItem) {
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         GlideImage(
-            model = orderItem.menu.menuImage,
+            model = orderItem.menu.imageUrl,
             contentDescription = "Burger",
             modifier = Modifier
                 .size(100.dp)
@@ -350,7 +353,7 @@ fun MyOrderItem(orderItem: OrderItem) {
 //                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
-                    text = orderItem.addons.joinToString(", ") { addon -> addon.addonName },
+                    text = orderItem.addOns.joinToString(", ") { addon -> addon.name },
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = HeadingLightGray,
