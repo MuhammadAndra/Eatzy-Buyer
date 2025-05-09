@@ -42,7 +42,7 @@ fun LoginScreen(
                 .padding(innerPadding)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.bg_login), // Ganti dengan nama file Anda
+                painter = painterResource(id = R.drawable.bg_login),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.matchParentSize()
@@ -87,11 +87,11 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Checkbox "Ingat Saya"
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .padding(start = 4.dp) // Sejajarkan dengan TextField
+                            .padding(start = 0.dp)
                             .fillMaxWidth()
                     ) {
                         Checkbox(
@@ -117,7 +117,7 @@ fun LoginScreen(
                 // Tombol Masuk
                 PrimaryButton(
                     text = "Masuk",
-                    onClick = { onLoginClick(email, password) },
+                    onClick = { onLoginClick(email,password) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -136,7 +136,6 @@ fun LoginScreen(
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFF59A2F),
                         fontSize = 14.sp,
-                        textDecoration = TextDecoration.Underline,
                         modifier = Modifier.clickable { onNavigateToRegister() }
                     )
                 }
