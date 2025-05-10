@@ -1,6 +1,5 @@
 package com.example.eatzy_buyer.ui.screen.listMenuScreen
 
-import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,6 +48,8 @@ import com.example.eatzy_buyer.data.model.getCanteenById
 import com.example.eatzy_buyer.data.model.getMenuCategoriesForCanteen
 import com.example.eatzy_buyer.ui.components.BottomNavBar
 import com.example.eatzy_buyer.ui.components.TopBarSearch
+import java.text.NumberFormat
+import java.util.Locale
 
 
 @Composable
@@ -169,7 +171,8 @@ fun MenuCard(
                 modifier = modifier
                     .size(100.dp)
                     .clip(RoundedCornerShape(10.dp)),
-                model = menu.url,
+                model = menu.imageUrl,
+                contentScale = ContentScale.Crop,
                 contentDescription = "Gambar ${menu.name}"
             )
             Column(verticalArrangement = Arrangement.spacedBy(13.dp)) {
@@ -179,7 +182,9 @@ fun MenuCard(
                     fontSize = 14.sp
                 )
                 Text(
-                    text = "Rp${menu.price}",
+                    text = NumberFormat
+                        .getCurrencyInstance(Locale("in", "ID"))
+                        .format(menu.price),
                     fontSize = 14.sp
                 )
             }
@@ -196,7 +201,7 @@ fun MenuCard(
                 colors = IconButtonDefaults.iconButtonColors(Color(0XFFFC9824))
             ) {
                 Icon(
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(16.dp),
                     imageVector = Icons.Filled.Favorite,
                     contentDescription = "Icon Favorite",
                     tint = Color(0XFFFFFFFF)
@@ -225,10 +230,11 @@ private fun MenuCardPreview() {
         menu = Menu(
             id = 0,
             name = "Ayam Ungkep",
-            url = "https://kecipir.id/cdn/shop/files/Pecelayamgoreng.jpg?v=1712221576",
+            imageUrl = "https://kecipir.id/cdn/shop/files/Pecelayamgoreng.jpg?v=1712221576",
             price = 13000.0,
-            status = true,
-            addOnCategoryId = listOf(0, 1, 2)
+            isAvailable = true,
+            addOnCategoryId = listOf(0, 1, 2),
+            preparationTime = 15
         ),
         onNavigateToAddMenu = {},
         onAddToFavorite = {}
@@ -284,25 +290,31 @@ private fun CategoryMenuCardPreview() {
                     id = 0,
                     name = "Ayam Crispy",
                     price = 13000.0,
-                    status = true,
-                    url = "https://img-global.cpcdn.com/recipes/3bff3fa797ed6480/400x400cq70/photo.jpg",
-                    addOnCategoryId = listOf(0, 1, 2)
+                    isAvailable = true,
+                    imageUrl = "https://img-global.cpcdn.com/recipes/3bff3fa797ed6480/400x400cq70/photo.jpg",
+                    addOnCategoryId = listOf(0, 1, 2),
+                    preparationTime = 15
+
                 ),
                 Menu(
                     id = 1,
                     name = "Ayam Crispy",
                     price = 13000.0,
-                    status = true,
-                    url = "https://img-global.cpcdn.com/recipes/3bff3fa797ed6480/400x400cq70/photo.jpg",
-                    addOnCategoryId = listOf(0, 1, 2)
+                    isAvailable = true,
+                    imageUrl = "https://img-global.cpcdn.com/recipes/3bff3fa797ed6480/400x400cq70/photo.jpg",
+                    addOnCategoryId = listOf(0, 1, 2),
+                    preparationTime = 15
+
                 ),
                 Menu(
                     id = 2,
                     name = "Ayam Crispy",
                     price = 13000.0,
-                    status = true,
-                    url = "https://img-global.cpcdn.com/recipes/3bff3fa797ed6480/400x400cq70/photo.jpg",
-                    addOnCategoryId = listOf(0, 1, 2)
+                    isAvailable = true,
+                    imageUrl = "https://img-global.cpcdn.com/recipes/3bff3fa797ed6480/400x400cq70/photo.jpg",
+                    addOnCategoryId = listOf(0, 1, 2),
+                    preparationTime = 15
+
                 )
             )
         )

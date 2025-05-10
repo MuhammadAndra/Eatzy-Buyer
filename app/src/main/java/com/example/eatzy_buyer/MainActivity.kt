@@ -10,7 +10,6 @@ import com.example.eatzy_buyer.ui.theme.EatzyBuyerTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             EatzyBuyerTheme {
                 AppNavigation()

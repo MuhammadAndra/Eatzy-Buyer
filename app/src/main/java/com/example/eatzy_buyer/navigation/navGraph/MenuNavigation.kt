@@ -32,8 +32,10 @@
         composable<AddMenu> { backStackEntry ->
             val addMenu: AddMenu = backStackEntry.toRoute()
             AddMenuScreen(
+                navController = navController,
                 idCategoryMenu = addMenu.idCategoryMenu,
-                idMenu = addMenu.idMenu
+                idMenu = addMenu.idMenu,
+                onNavigateUp = {navController.popBackStack()}
             )
         }
     }
