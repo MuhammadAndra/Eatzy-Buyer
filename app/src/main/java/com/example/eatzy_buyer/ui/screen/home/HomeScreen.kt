@@ -1,9 +1,13 @@
 package com.example.eatzy_buyer.ui.screen.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,7 +16,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -31,6 +37,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import com.example.eatzy_buyer.ui.components.BottomNavBar
 import com.example.eatzy_buyer.data.model.Canteen
 import com.example.eatzy_buyer.data.model.canteenList
@@ -39,7 +46,7 @@ import com.example.eatzy_buyer.data.model.canteenList
 fun HomeScreen(
     navController: NavController,
     onNavigateToSearchScreen: () -> Unit,
-    onNavigateToListMenuScreen: (canteenId:Int) -> Unit
+    onNavigateToListMenuScreen: (canteenId: Int) -> Unit
 
 ) {
     Scaffold(
@@ -89,8 +96,8 @@ private fun HomeScreenPreview() {
 @Composable
 fun Greetings(username: String) {
     Column {
-        Text("Hey $username !", fontSize = 14.sp)
-        Text("Welcome Back!", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Hey $username!", fontSize = 16.sp)
+        Text("Selamat Datang!", fontSize = 20.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -113,7 +120,7 @@ fun SearchButton(onNavigateToSearchScreen: () -> Unit) {
         Text(
             modifier = Modifier.padding(vertical = 13.dp, horizontal = 30.dp),
             text = "Cari menu atau toko...",
-            fontSize = 11.sp,
+            fontSize = 14.sp,
             color = Color(0XFF8F8F8F)
         )
     }
@@ -128,6 +135,7 @@ private fun SearchButtonPreview() {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun CanteenCard(modifier: Modifier = Modifier, canteen: Canteen) {
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(9.dp),
@@ -139,7 +147,17 @@ fun CanteenCard(modifier: Modifier = Modifier, canteen: Canteen) {
                 .height(142.dp),
             contentScale = ContentScale.Crop,
             model = canteen.url,
-            contentDescription = canteen.name
+            contentDescription = canteen.name,
+            loading = placeholder {
+                Box(
+                    modifier = Modifier
+                        .background(Color.Transparent)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Color(0XFFFC9824))
+                }
+            }
         )
         Column(
             modifier = Modifier.padding(horizontal = 6.dp),
@@ -163,7 +181,7 @@ private fun CanteenCardPreview() {
             name = "Kantin Bu Ninik",
             url = "https://cdn.pixabay.com/photo/2017/05/07/08/56/pancakes-2291908_1280.jpg",
             status = true,
-            menuCategoryId = listOf(1,2,3)
+            menuCategoryId = listOf(1, 2, 3)
         ),
 //        onNavigateToListMenuScreen = {}
     )
@@ -173,7 +191,7 @@ private fun CanteenCardPreview() {
 fun CanteenList(
     modifier: Modifier = Modifier,
     canteens: List<Canteen>,
-    onNavigateToListMenuScreen: (canteenId:Int) -> Unit
+    onNavigateToListMenuScreen: (canteenId: Int) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),

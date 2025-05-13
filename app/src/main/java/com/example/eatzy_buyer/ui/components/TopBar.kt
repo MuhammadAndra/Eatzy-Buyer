@@ -29,7 +29,12 @@ fun TopBar(
 ) {
     CenterAlignedTopAppBar(
         title = {
-            Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = title,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0XFF455E84)
+            )
         },
         navigationIcon = {
             IconButton(onClick = onNavigateUp) {
@@ -40,6 +45,7 @@ fun TopBar(
                 )
             }
         },
+
     )
 }
 

@@ -22,7 +22,10 @@ fun TestApiScreen(
     val vm: TestApiViewModel = viewModel()
     val users by vm.users.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) { vm.fetchUsers() }
+    LaunchedEffect(Unit) {
+//        vm.fetchUsers()
+        vm.fetchUsersSuspend()
+    }
     Scaffold { innerpadding ->
         Column(modifier = Modifier.padding(innerpadding)) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {

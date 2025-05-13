@@ -7,7 +7,7 @@ data class Order (
     val status: OrderStatus,
     val orderTime: String,
     val finishedTime: String,
-    val scheduleTime: String,
+    val scheduleTime: String?,
     val estimationTime: Int,
     val totalPrice: Double,
     val orderItem: List<OrderItem>,

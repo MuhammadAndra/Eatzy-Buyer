@@ -28,9 +28,9 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
             )
         })
     }
-    composable<ChangePassword> {
-        ChangePasswordScreen(
-            onNavigateToLogin = { navController.navigate(Login) },
-            onNavigateToCanteen = { navController.navigate(Canteen) })
-    }
+//    composable<ChangePassword> {
+//        ChangePasswordScreen(
+//            onNavigateToLogin = { navController.navigate(Login) },
+//            onNavigateToCanteen = { navController.navigate(Canteen) })
+//    }
 }

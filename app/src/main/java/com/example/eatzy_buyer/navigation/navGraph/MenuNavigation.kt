@@ -7,6 +7,7 @@
     import androidx.navigation.toRoute
     import com.example.eatzy_buyer.ui.screen.addMenu.AddMenuScreen
     import com.example.eatzy_buyer.ui.screen.listMenuScreen.ListMenuScreen
+    import com.example.eatzy_buyer.ui.search.SearchScreen
 
 
     @Serializable
@@ -14,6 +15,9 @@
 
     @Serializable
     data class AddMenu(val idCategoryMenu: Int, val idMenu: Int)
+
+    @Serializable
+    object Search
 
     fun NavGraphBuilder.menuGraph(navController: NavController) {
         composable<ListMenu> { backStackEntry ->
@@ -26,7 +30,8 @@
                     navController.navigate(
                         AddMenu(idCategoryMenu = idCategoryMenu, idMenu = idMenu)
                     )
-                }
+                },
+                onNavigateToCart = {}
             )
         }
         composable<AddMenu> { backStackEntry ->
@@ -37,5 +42,8 @@
                 idMenu = addMenu.idMenu,
                 onNavigateUp = {navController.popBackStack()}
             )
+        }
+        composable<Search>{
+            SearchScreen(onNavigateUp = { navController.navigateUp() })
         }
     }

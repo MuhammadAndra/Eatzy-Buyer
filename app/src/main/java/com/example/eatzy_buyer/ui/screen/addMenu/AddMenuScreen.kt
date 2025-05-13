@@ -24,6 +24,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -58,6 +59,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import com.example.eatzy_buyer.data.model.AddOn
 import com.example.eatzy_buyer.data.model.AddOnCategory
 import com.example.eatzy_buyer.data.model.Menu
@@ -65,9 +67,11 @@ import com.example.eatzy_buyer.data.model.getAddOnCategories
 
 import com.example.eatzy_buyer.data.model.getMenuById
 import com.example.eatzy_buyer.ui.components.TopBar
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import java.text.NumberFormat
 import java.util.Locale
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun AddMenuScreen(
     modifier: Modifier = Modifier,
@@ -120,8 +124,6 @@ fun AddMenuScreen(
         }
     }
 
-
-    Text(menu.name)
     Scaffold(
         topBar = {
             TopBar(
@@ -132,23 +134,40 @@ fun AddMenuScreen(
 //        bottomBar = { BottomNavBar(navController = navController) }
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-
+            modifier = Modifier.fillMaxSize()
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        start = 16.dp,
-                        end = 16.dp,
-                        bottom = 70.dp
-                    ), // supaya tidak ketabrak tombol
+                    .fillMaxSize(), // supaya tidak ketabrak tombol
                 contentPadding = innerPadding,
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 item {
+                    GlideImage(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(350.dp),
+                        model = menu.imageUrl,
+                        contentDescription = "Image ${menu.name}",
+                        contentScale = ContentScale.Crop,
+                        loading = placeholder {
+                            Box(
+                                modifier = Modifier
+                                    .background(Color.Transparent)
+                                    .fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = Color(0XFFFC9824))
+                            }
+                        }
+                    )
+                }
+                item {
                     MenuHeader(
+                        modifier = Modifier.padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                        ),
                         menu = menu,
                         quantity = quantity,
                         onIncrement = { quantity++ },
@@ -161,8 +180,8 @@ fun AddMenuScreen(
                             modifier = Modifier.padding(
                                 start = 16.dp,
                                 end = 16.dp,
-                                bottom = 70.dp
-                            ), name = addOnCategory.name
+                            ),
+                            name = addOnCategory.name
                         ) {
                             Column {
                                 if (addOnCategory.isMultipleChoice) {
@@ -209,7 +228,14 @@ fun AddMenuScreen(
                     }
                 }
                 item {
-                    AddMenuCustomCard(name = "Catatan Untuk Kantin") {
+                    AddMenuCustomCard(
+                        modifier = Modifier.padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = 70.dp
+                        ),
+                        name = "Catatan Untuk Kantin"
+                    ) {
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -230,7 +256,7 @@ fun AddMenuScreen(
                                 }
                             ),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFFFC9824),
+                                focusedBorderColor = Color(0xFF455E84),
                             )
                         )
                     }
@@ -242,7 +268,7 @@ fun AddMenuScreen(
 
             // Tombol mengambang
             ElevatedCard(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .background(Color(0XFFFFFFFF))
                     .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
@@ -255,37 +281,20 @@ fun AddMenuScreen(
                         )
                     ) // Outline-nya di sini
                     .align(Alignment.BottomCenter),
-                elevation = CardDefaults.elevatedCardElevation(4.dp)
+                elevation = CardDefaults.elevatedCardElevation(4.dp),
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = Color.White
+                )
             ) {
-                ElevatedButton(
-                    onClick = {
-
-                    },
-                    modifier = Modifier
-                        .padding(vertical = 10.dp, horizontal = 18.dp)
-//                        .align(Alignment.Center)
-                        .fillMaxWidth(),
-                    colors = ButtonDefaults.elevatedButtonColors(
-                        Color(
-                            0xFFFC9824
-                        )
-                    )
-                ) {
-                    Text(
-                        text = "Tambah ke Keranjang ${
-                            NumberFormat
-                                .getCurrencyInstance(Locale("in", "ID"))
-                                .format(menu.price * quantity + totalAddOnPrice)
-                        }",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
+                AddMenuCustomButton(
+                    onClick = {},
+                    fullPrice = (menu.price * quantity + menu.price * quantity + totalAddOnPrice)
+                )
             }
         }
     }
 }
+
 
 @Preview
 @Composable
@@ -308,17 +317,9 @@ fun MenuHeader(
     onDecrement: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
-        GlideImage(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(350.dp),
-            model = menu.imageUrl,
-            contentDescription = "Image ${menu.name}",
-            contentScale = ContentScale.Crop
-        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -378,7 +379,7 @@ fun IncrementButton(
     ) {
         IconButton(
             onClick = onDecrement,
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(25.dp),
             colors = IconButtonDefaults.iconButtonColors(
                 Color(0XFFFC9824)
             )
@@ -386,14 +387,14 @@ fun IncrementButton(
             Icon(
                 imageVector = Icons.Filled.Remove,
                 contentDescription = "Icon Decrement",
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(20.dp),
                 tint = Color(0XFFFFFFFF)
             )
         }
         Text(count.toString(), fontSize = 15.sp)
         IconButton(
             onClick = onIncrement,
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(25.dp),
             colors = IconButtonDefaults.iconButtonColors(
                 Color(0XFFFC9824)
             )
@@ -401,7 +402,7 @@ fun IncrementButton(
             Icon(
                 imageVector = Icons.Filled.Add,
                 contentDescription = "Icon Decrement",
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(20.dp),
                 tint = Color(0XFFFFFFFF)
             )
         }
@@ -421,10 +422,13 @@ fun AddMenuCustomCard(
     content: @Composable () -> Unit
 ) {
     ElevatedCard(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
-        elevation = CardDefaults.cardElevation(3.dp)
+        elevation = CardDefaults.cardElevation(3.dp),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = Color.White
+        )
     ) {
         Column(modifier = Modifier.padding(top = 12.dp, start = 12.dp)) {
             Text(name)
@@ -483,7 +487,7 @@ fun AddOnCardCheckbox(
         ) {
             Checkbox(
                 onCheckedChange = null, checked = checked,
-                colors = CheckboxDefaults.colors(Color(0XFFFC9824)),
+                colors = CheckboxDefaults.colors(Color(0XFF455E84)),
             )
             Text(
                 text = addOn.name,
@@ -534,7 +538,7 @@ fun AddOnCardRadioButton(
                 selected = selected,
                 onClick = null,
                 colors = RadioButtonDefaults.colors(
-                    selectedColor = Color(0XFFFC9824)
+                    selectedColor = Color(0XFF455E84)
                 )
             )
             Text(
@@ -561,4 +565,34 @@ private fun AddOnCardRadioButtonPreview() {
         selected = false,
         onSelect = {}
     )
+}
+
+@Composable
+fun AddMenuCustomButton(
+    modifier: Modifier = Modifier,
+    fullPrice: Double,
+    onClick: () -> Unit
+) {
+    ElevatedButton(
+        onClick = onClick,
+        modifier = Modifier
+            .padding(vertical = 10.dp, horizontal = 18.dp)
+            .fillMaxWidth(),
+        colors = ButtonDefaults.elevatedButtonColors(
+            Color(
+                0xFFFC9824
+            )
+        )
+    ) {
+        Text(
+            text = "Tambah ke Keranjang ${
+                NumberFormat
+                    .getCurrencyInstance(Locale("in", "ID"))
+                    .format(fullPrice)
+            }",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+    }
 }
