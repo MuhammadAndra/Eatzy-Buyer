@@ -48,7 +48,7 @@ fun EatzyBuyerTheme(
             )
         }
 
-        darkTheme -> DarkColorScheme
+        darkTheme -> LightColorScheme
         else -> LightColorScheme
     }
 
