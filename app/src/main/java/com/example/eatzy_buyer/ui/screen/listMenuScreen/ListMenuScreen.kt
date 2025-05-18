@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +20,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,6 +31,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -57,10 +58,8 @@ import com.example.eatzy_buyer.data.model.MenuCategory
 import com.example.eatzy_buyer.data.model.getCanteenById
 import com.example.eatzy_buyer.data.model.getMenuCategoriesForCanteen
 import com.example.eatzy_buyer.data.model.getUncheckoutOrderByCanteenId
-import com.example.eatzy_buyer.ui.components.BottomNavBar
 import com.example.eatzy_buyer.ui.components.TopBarSearch
 import com.example.eatzy_buyer.ui.screen.addMenu.IncrementButton
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -73,14 +72,24 @@ fun ListMenuScreen(
     onNavigateToAddMenu: (idCategoryMenu: Int, idMenu: Int) -> Unit,
     onNavigateToCart: () -> Unit
 ) {
+    val vm: ListMenuViewModel = viewModel()
+    val menuCategories by vm.menuCategories.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+//        vm.fetchUsers()
+        vm.fetchMenuCategories(id = canteenId)
+    }
+
     var searchQuery by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
 
     //disini bakal ada pengambilan objek canteen + pengambilan list menu canteen dari viewmodel
     //bawah ini dummy
     val canteen = getCanteenById(canteenId)
-    val categoryMenuList = getMenuCategoriesForCanteen(canteen)
+//    val categoryMenuList = getMenuCategoriesForCanteen(canteen)
     val order = getUncheckoutOrderByCanteenId(canteenId = canteenId)
+
+
 
 
     //nanti ambil fungsi dari ViewModel
@@ -117,7 +126,7 @@ fun ListMenuScreen(
                     ),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                categoryMenuList.forEach { categoryMenu ->
+                menuCategories.forEach { categoryMenu ->
                     item {
                         MenuCategoryCard(category = categoryMenu) {
                             Column(

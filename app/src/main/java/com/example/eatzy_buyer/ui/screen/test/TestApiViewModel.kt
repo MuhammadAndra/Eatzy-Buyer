@@ -29,9 +29,9 @@ class TestApiViewModel : ViewModel() {
         }
     }
 
-    fun fetchUsersSuspend() {
+    fun fetchUsersSuspend(token:String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _users.value = repository.getUsersSuspend()
+            _users.value = repository.getUsersSuspend(token = token)
         }
     }
 

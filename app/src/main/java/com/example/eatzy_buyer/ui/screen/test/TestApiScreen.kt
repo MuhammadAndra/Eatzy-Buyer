@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.eatzy_buyer.token
 
 @Composable
 fun TestApiScreen(
@@ -24,13 +25,13 @@ fun TestApiScreen(
 
     LaunchedEffect(Unit) {
 //        vm.fetchUsers()
-        vm.fetchUsersSuspend()
+        vm.fetchUsersSuspend(token = token)
     }
     Scaffold { innerpadding ->
         Column(modifier = Modifier.padding(innerpadding)) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 items(users){user ->
-                    Text("${user.name} - ${user.email}")
+                    Text("${user.username} - ${user.email}")
                 }
             }
         }

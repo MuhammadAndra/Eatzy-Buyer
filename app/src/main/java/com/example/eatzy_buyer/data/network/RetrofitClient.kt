@@ -1,5 +1,6 @@
 package com.example.eatzy_buyer.data.network
 
+import com.example.eatzy_buyer.data.network.api.CanteenApiService
 import com.example.eatzy_buyer.data.network.api.TestApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -24,5 +25,6 @@ object RetrofitClient {
     }
 
     val testApi: TestApiService by lazy { retrofit.create(TestApiService::class.java) }
+    val canteenApi: CanteenApiService by lazy { retrofit.create(CanteenApiService::class.java) }
 
 }

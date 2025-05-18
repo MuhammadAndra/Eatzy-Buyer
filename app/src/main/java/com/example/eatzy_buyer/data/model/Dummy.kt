@@ -9,7 +9,8 @@ fun getCanteenById(id: Int): Canteen {
 
 fun getMenuCategoriesForCanteen(canteen: Canteen): List<MenuCategory> {
     val menuCategoryIds = canteen.menuCategoryId ?: emptyList()
-    return categoryMenuList.filter { it.id in menuCategoryIds }
+    categoryMenuList.filter { it.id in menuCategoryIds }
+    return emptyList()
 }
 
 fun getMenuById(idCategoryMenu: Int, idMenu: Int): Menu {
@@ -31,7 +32,7 @@ fun getUncheckoutOrderByCanteenId(
     canteenId: Int,
 ): Order? {
     return orderList.firstOrNull {
-        it.canteen.id == canteenId && it.status == OrderStatus.INCART
+        it.canteenId == canteenId && it.status == OrderStatus.INCART
         // Pastikan enum status ini konsisten
     }
 }
@@ -39,48 +40,48 @@ fun getUncheckoutOrderByCanteenId(
 //list dummy
 val canteenList = listOf(
     Canteen(
-        id = 0,
+        id = 4,
         name = "Kantin Tahu Telor",
-        url = "https://img-global.cpcdn.com/recipes/2b31923cb4aff00c/680x482cq70/tahu-telur-foto-resep-utama.jpg",
-        status = true,
-        menuCategoryId = listOf(
-            0,
-            2,
-            3
-        ) // Menyesuaikan dengan kategori menu unik
+        imageUrl = "https://img-global.cpcdn.com/recipes/2b31923cb4aff00c/680x482cq70/tahu-telur-foto-resep-utama.jpg",
+        isOpen = true,
+//        menuCategoryId = listOf(
+//            0,
+//            2,
+//            3
+//        ) // Menyesuaikan dengan kategori menu unik
     ),
     Canteen(
         id = 1,
         name = "Kantin Lalapan",
-        url = "https://img-global.cpcdn.com/recipes/bbc8ae6d7a514653/400x400cq70/photo.jpg",
-        status = true,
-        menuCategoryId = listOf(
-            1,
-            4,
-            5
-        ) // Menyesuaikan dengan kategori menu unik
+        imageUrl = "https://img-global.cpcdn.com/recipes/bbc8ae6d7a514653/400x400cq70/photo.jpg",
+        isOpen = true,
+//        menuCategoryId = listOf(
+//            1,
+//            4,
+//            5
+//        ) // Menyesuaikan dengan kategori menu unik
     ),
     Canteen(
         id = 2,
         name = "Kantin Katsu",
-        url = "https://img-global.cpcdn.com/recipes/b51561ce4711d66a/1200x630cq70/photo.jpg",
-        status = true,
-        menuCategoryId = listOf(
-            6,
-            7,
-            8
-        ) // Menyesuaikan dengan kategori menu unik
+        imageUrl = "https://img-global.cpcdn.com/recipes/b51561ce4711d66a/1200x630cq70/photo.jpg",
+        isOpen = true,
+//        menuCategoryId = listOf(
+//            6,
+//            7,
+//            8
+//        ) // Menyesuaikan dengan kategori menu unik
     ),
     Canteen(
         id = 3,
         name = "Kantin Ayam Bakar",
-        url = "https://img-global.cpcdn.com/recipes/18e75e45937347db/1200x630cq70/photo.jpg",
-        status = true,
-        menuCategoryId = listOf(
-            9,
-            10,
-            11
-        ) // Menyesuaikan dengan kategori menu unik
+        imageUrl = "https://img-global.cpcdn.com/recipes/18e75e45937347db/1200x630cq70/photo.jpg",
+        isOpen = true,
+//        menuCategoryId = listOf(
+//            9,
+//            10,
+//            11
+//        ) // Menyesuaikan dengan kategori menu unik
     )
 )
 val categoryMenuList = listOf(
@@ -350,13 +351,7 @@ val orderList = listOf(
     Order(
         id = 0,
         buyerId = 101,
-        canteen = Canteen(
-            id = 3,
-            name = "Kantin Ayam Bakar",
-            url = "https://img-global.cpcdn.com/recipes/18e75e45937347db/1200x630cq70/photo.jpg",
-            status = true,
-            menuCategoryId = listOf(9, 10, 11)
-        ),
+        canteenId = 3,
         status = OrderStatus.INCART, // misal enum
         orderTime = "2025-05-09T10:00:00",
         finishedTime = "",

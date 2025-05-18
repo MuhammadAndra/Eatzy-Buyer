@@ -33,9 +33,11 @@ class TestRepository {
         })
     }
 
-    suspend fun getUsersSuspend(): List<User> {
+    suspend fun getUsersSuspend(token:String): List<User> {
         return try {
-            val response = RetrofitClient.testApi.getUsersResponse()
+            val response = RetrofitClient.testApi.getUsersResponse(
+//                token = "Bearer $token"
+            )
             if (response.isSuccessful) {
                 response.body() ?: emptyList()
             } else {
