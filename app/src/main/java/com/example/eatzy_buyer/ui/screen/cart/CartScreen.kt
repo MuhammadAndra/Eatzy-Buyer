@@ -1,5 +1,6 @@
 package com.example.eatzy_buyer.ui.screen.cart
 
+
 import android.icu.text.NumberFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,7 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.*
@@ -29,14 +29,22 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.eatzy_buyer.data.model.Cart
 import com.example.eatzy_buyer.ui.components.BottomNavBar
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
     navController: NavController,
     viewModel: CartViewModel = viewModel(),
-    onCheckoutClick: () -> Unit
+    onCheckoutClick: (Cart) -> Unit
 ) {
+    // Observe carts from ViewModel
     val carts by viewModel.carts.collectAsState()
+
+
+    // Fetch carts from API once when this screen is launched
+    LaunchedEffect(Unit) {
+        viewModel.fetchCartsFromApi()
+    }
 
     Scaffold(
         containerColor = Color.White,
@@ -69,7 +77,7 @@ fun CartScreen(
                     CartCard(
                         cart = cart,
                         onCheckoutClick = {
-                            navController.navigate("confirmation")
+                            onCheckoutClick(cart)
                         }
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -78,6 +86,7 @@ fun CartScreen(
         }
     }
 }
+
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -102,7 +111,7 @@ fun CartCard(
                     tint = Color(0xFFFC9824)
                 )
                 Text(
-                    text = cart.kantinName,
+                    text = cart.canteen_name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -117,7 +126,7 @@ fun CartCard(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     GlideImage(
-                        model = item.imageUrl,
+                        model = item.menu_image,
                         contentDescription = "Item Image",
                         modifier = Modifier
                             .size(100.dp)
@@ -145,7 +154,7 @@ fun CartCard(
                             Spacer(modifier = Modifier.width(6.dp))
 
                             Text(
-                                text = item.name,
+                                text = item.menu_name,
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -153,9 +162,9 @@ fun CartCard(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        if (item.addon.isNotEmpty()) {
+                        if (item.addons.isNotEmpty()) {
                             Text(
-                                text = item.addon.joinToString(separator = ", "),
+                                text = item.addons.joinToString(separator = ", "),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.DarkGray
                             )
@@ -182,7 +191,7 @@ fun CartCard(
                         }
 
                         Text(
-                            formatRupiah(item.price.toDouble()),
+                            formatRupiah(item.menu_price.toDouble()),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -203,7 +212,7 @@ fun CartCard(
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Text(
-                        text = formatRupiah(cart.total),
+                        text = formatRupiah(cart.total_price),
                         fontSize = 20.sp
                     )
                 }

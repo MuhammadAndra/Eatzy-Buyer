@@ -102,7 +102,7 @@ fun ConfirmationScreen(navController: NavController, onOrderClick: () -> Unit) {
                 val labelText = if (pickedTime != null) {
                     val endTime = pickedTime!!.plusMinutes(30)
                     val timeFormat = DateTimeFormatter.ofPattern("HH:mm")
-                    "Pesan untuk Nanti - ${pickedTime!!.format(timeFormat)} - ${endTime.format(timeFormat)}"
+                    "Pesan untuk Nanti :  ${pickedTime!!.format(timeFormat)} - ${endTime.format(timeFormat)}"
                 } else {
                     "Pesan untuk Nanti"
                 }

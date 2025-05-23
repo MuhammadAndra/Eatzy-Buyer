@@ -1,64 +1,58 @@
 package com.example.eatzy_buyer.ui.screen.cart
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.eatzy_buyer.data.model.Cart
+import com.example.eatzy_buyer.data.network.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import com.example.eatzy_buyer.data.model.Cart
-import com.example.eatzy_buyer.data.model.CartItem
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class CartViewModel : ViewModel() {
 
-    // Private mutable state
-    private val _carts = MutableStateFlow<List<Cart>>(dummyCarts)
-    // Public immutable state
+    // State untuk menyimpan data cart dari API
+    private val _carts = MutableStateFlow<List<Cart>>(emptyList())
     val carts: StateFlow<List<Cart>> = _carts
 
-    fun getTotalPrice(): Double {
-        return _carts.value.sumOf { it.total }
+    // Fungsi untuk memuat data cart dari API
+    fun fetchCartsFromApi() {
+        RetrofitClient.testApi.getCart().enqueue(object : Callback<List<Cart>> {
+            override fun onResponse(call: Call<List<Cart>>, response: Response<List<Cart>>) {
+                if (response.isSuccessful) {
+                    _carts.value = response.body() ?: emptyList()
+                    Log.d("CartViewModel", "Loaded carts: ${response.body()}")
+                } else {
+                    Log.e("CartViewModel", "Failed to load carts: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<List<Cart>>, t: Throwable) {
+                Log.e("CartViewModel", "Error loading carts: ${t.message}")
+            }
+        })
     }
 
+    // Menghitung total semua cart
+    fun getTotalPrice(): Double {
+        return _carts.value.sumOf { it.total_price }
+    }
+
+    // Menghapus semua cart (lokal)
     fun clearCart() {
         _carts.value = emptyList()
     }
 
+    // Menghapus satu cart berdasarkan order_id
     fun removeCart(cart: Cart) {
-        _carts.value = _carts.value.filterNot { it.id == cart.id }
+        _carts.value = _carts.value.filterNot { it.order_id == cart.order_id }
     }
 
+    // Memperbarui data cart lokal
     fun updateCart(updatedCart: Cart) {
         _carts.value = _carts.value.map {
-            if (it.id == updatedCart.id) updatedCart else it
+            if (it.order_id == updatedCart.order_id) updatedCart else it
         }
-    }
-
-    companion object {
-        // Dummy Data
-        val dummyCarts = listOf(
-            Cart(
-                id = 1,
-                kantinName = "Kantin 1",
-                items = listOf(
-                    CartItem("Menu 3", 1, listOf("Sambal Bawang", "Dibungkus"), 12000.0, imageUrl = "https://i0.wp.com/i.gojekapi.com/darkroom/gofood-indonesia/v2/images/uploads/eb33f8da-5098-4153-9e99-8feb74c9d072_Go-Biz_20231128_161650.jpeg")
-                ),
-                total = 12000.0
-            ),
-            Cart(
-                id = 2,
-                kantinName = "Kantin 3",
-                items = listOf(
-                    CartItem("Menu 5", 1, listOf(), 13000.0, "Pedas", imageUrl = "https://i0.wp.com/i.gojekapi.com/darkroom/gofood-indonesia/v2/images/uploads/eb33f8da-5098-4153-9e99-8feb74c9d072_Go-Biz_20231128_161650.jpeg")
-                ),
-                total = 13000.0
-            ),
-            Cart(
-                id = 3,
-                kantinName = "Kantin 2",
-                items = listOf(
-                    CartItem("Menu 3", 1, listOf(), 11000.0, "", imageUrl = "https://i0.wp.com/i.gojekapi.com/darkroom/gofood-indonesia/v2/images/uploads/eb33f8da-5098-4153-9e99-8feb74c9d072_Go-Biz_20231128_161650.jpeg"),
-                    CartItem("Menu 1", 2, listOf("Bawang"), 11000.0, "Pedas dan Sedang", imageUrl = "https://i0.wp.com/i.gojekapi.com/darkroom/gofood-indonesia/v2/images/uploads/eb33f8da-5098-4153-9e99-8feb74c9d072_Go-Biz_20231128_161650.jpeg")
-                ),
-                total = 35000.0
-            )
-        )
     }
 }
