@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,6 +24,7 @@ import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.SoupKitchen
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.LinearProgressIndicator
@@ -31,6 +34,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,7 +45,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -52,13 +60,15 @@ import com.example.eatzy_buyer.data.model.Menu
 import com.example.eatzy_buyer.data.model.Order
 import com.example.eatzy_buyer.data.model.OrderItem
 import com.example.eatzy_buyer.data.model.OrderStatus
+import com.example.eatzy_buyer.token
 import com.example.eatzy_buyer.ui.components.BottomNavBar
+import com.example.eatzy_buyer.ui.components.TopBar
+import com.example.eatzy_buyer.ui.screen.test.MyOrderViewModel
+import com.example.eatzy_buyer.ui.theme.EatzyOrange
+import com.example.eatzy_buyer.ui.theme.HeadingGray
+import com.example.eatzy_buyer.ui.theme.HeadingLightGray
 import java.text.NumberFormat
 import java.util.Locale
-
-val EatzyOrange = Color(0xFFFC9824)
-val HeadingGray = Color(0xFF675E5E)
-val HeadingLightGray = Color(0xFF8F8F8F)
 
 private val exampleOrders = Order(
     id = 1,
@@ -67,7 +77,7 @@ private val exampleOrders = Order(
         id = 1,
         name = "Kantin Pak Muklis"
     ),
-    status = OrderStatus.WAITING,
+    status = OrderStatus.PROCESSING,
     orderTime = "2025-05-06 14:23:45",
     finishedTime = "2025-05-06 14:23:45",
     scheduleTime = "2025-05-06 14:23:45",
@@ -85,7 +95,7 @@ private val exampleOrders = Order(
                 imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
                 isAvailable = true,
                 addOnCategoryId = emptyList(),
-                menuPrice = 5000.00
+                price = 5000.00
             ),
             addOns = listOf(
                 AddOn(
@@ -113,7 +123,119 @@ private val exampleOrders = Order(
                 imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
                 isAvailable = true,
                 addOnCategoryId = emptyList(),
-                menuPrice = 5000.00
+                price = 5000.00
+            ),
+            addOns = listOf(
+                AddOn(
+                    id = 1,
+                    menuId = 2,
+                    name = "Mendoan",
+                    price = 12000.00
+                ),
+                AddOn(
+                    id = 2,
+                    menuId = 2,
+                    name = "Cabe",
+                    price = 12000.00
+                ),
+            )
+        ),
+        OrderItem(
+            id = 2,
+            orderId = 1,
+            details = "Digoreng tidak usah matang",
+            menu = Menu(
+                id = 2,
+                name = "Pecel lele",
+                preparationTime = 7,
+                imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
+                isAvailable = true,
+                addOnCategoryId = emptyList(),
+                price = 5000.00
+            ),
+            addOns = listOf(
+                AddOn(
+                    id = 1,
+                    menuId = 2,
+                    name = "Mendoan",
+                    price = 12000.00
+                ),
+                AddOn(
+                    id = 2,
+                    menuId = 2,
+                    name = "Cabe",
+                    price = 12000.00
+                ),
+            )
+        ),
+        OrderItem(
+            id = 2,
+            orderId = 1,
+            details = "Digoreng tidak usah matang",
+            menu = Menu(
+                id = 2,
+                name = "Pecel lele",
+                preparationTime = 7,
+                imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
+                isAvailable = true,
+                addOnCategoryId = emptyList(),
+                price = 5000.00
+            ),
+            addOns = listOf(
+                AddOn(
+                    id = 1,
+                    menuId = 2,
+                    name = "Mendoan",
+                    price = 12000.00
+                ),
+                AddOn(
+                    id = 2,
+                    menuId = 2,
+                    name = "Cabe",
+                    price = 12000.00
+                ),
+            )
+        ),
+        OrderItem(
+            id = 2,
+            orderId = 1,
+            details = "Digoreng tidak usah matang",
+            menu = Menu(
+                id = 2,
+                name = "Pecel lele",
+                preparationTime = 7,
+                imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
+                isAvailable = true,
+                addOnCategoryId = emptyList(),
+                price = 5000.00
+            ),
+            addOns = listOf(
+                AddOn(
+                    id = 1,
+                    menuId = 2,
+                    name = "Mendoan",
+                    price = 12000.00
+                ),
+                AddOn(
+                    id = 2,
+                    menuId = 2,
+                    name = "Cabe",
+                    price = 12000.00
+                ),
+            )
+        ),
+        OrderItem(
+            id = 2,
+            orderId = 1,
+            details = "Digoreng tidak usah matang",
+            menu = Menu(
+                id = 2,
+                name = "Pecel lele",
+                preparationTime = 7,
+                imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
+                isAvailable = true,
+                addOnCategoryId = emptyList(),
+                price = 5000.00
             ),
             addOns = listOf(
                 AddOn(
@@ -133,90 +255,157 @@ private val exampleOrders = Order(
     )
 )
 
-private val orders = exampleOrders;
-
-val statusMessage = when (orders.status) {
-    OrderStatus.CANCELED -> "Pesanan Dibatalkan Oleh Penjual"
-    OrderStatus.WAITING -> "Menunggu Konfirmasi Penjual"
-    OrderStatus.PROCESSING -> "Pesanan Diproses"
-    OrderStatus.FINISHED -> "Pesanan Selesai"
-    else -> "Order status tidak diketahui"
-}
-
-val statusProgress = when (orders.status) {
-    OrderStatus.WAITING -> 1
-    OrderStatus.PROCESSING -> 2
-    OrderStatus.FINISHED -> 3
-    else -> 0
-}
+//private val order = exampleOrders;
 
 @Composable
-fun MyOrderScreen(modifier: Modifier = Modifier, navController: NavController) {
+fun MyOrderScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    orderId: Int,
+    onNavigateup: () -> Unit
+) {
 
-    Scaffold(bottomBar = { BottomNavBar(navController) }) { innerPadding ->
+    val vm: MyOrderViewModel = viewModel()
+    val order by vm.order.collectAsStateWithLifecycle(Order())
+
+    LaunchedEffect(Unit) {
+        vm.fetchOrdersByIdResponse(token = token, orderId = orderId)
+    }
+
+    Scaffold(
+        bottomBar = { BottomNavBar(navController) },
+        topBar = {
+            TopBar(
+                modifier = Modifier,
+                title = "Pesanan Saya",
+                onNavigateUp = onNavigateup
+            )
+        }
+    ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
+//                .fillMaxSize()
         ) {
-            MyOrderHeading()
-            Spacer(modifier = Modifier.height(16.dp))
-            Column(
+
+            MyOrderHeading(order = order)
+//            Spacer(modifier = Modifier.height(16.dp))
+            LazyColumn(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
-            ){
-                Text(
-                    text = orders.canteen.name,
-                    fontWeight = FontWeight.Medium,
-                    color = HeadingLightGray
-                )
-                Text(
-                    text = "Rincian Menu",
-                    fontWeight = FontWeight.Bold,
-                    color = HeadingGray
-                )
-                ElevatedCard(
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White,
-                    ),
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 3.dp,
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-                ) {
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    orders.orderItem.forEach { orderItem ->
-                        MyOrderItem(orderItem)
-                    }
-//                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        text = NumberFormat.getCurrencyInstance(Locale("in", "ID")).format(orders.totalPrice),
-                        fontWeight = FontWeight.Medium,
-                        color = HeadingGray,
-                        fontSize = 13.sp
-                    )
+            ) {
+                item {
                     Spacer(modifier = Modifier.height(8.dp))
                 }
+                item {
+                    Text(
+                        text = order.canteen.name,
+//                    fontWeight = FontWeight.Medium,
+                        color = HeadingLightGray,
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        text = "Rincian Menu",
+                        fontWeight = FontWeight.Bold,
+                        color = HeadingGray,
+                        fontSize = 16.sp
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OrderCard(order = order)
+                }
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
             }
         }
     }
 }
 
 @Composable
-fun MyOrderHeading() {
+fun OrderCard(modifier: Modifier = Modifier, order: Order) {
+    ElevatedCard(
+//        modifier = Modifier
+//            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White,
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp,
+        ),
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Column {
+            // Group items by a composite key (details + menu + addons)
+            val groupedItems = order.orderItem.groupBy { item ->
+                // Create a key combining all 3 conditions
+                Triple(
+                    item.details,
+                    item.menu.id,  // Assuming Menu has an ID; adjust if needed
+                    item.addOns.sortedBy { it.id }.joinToString(",") { it.id.toString() } // Sort addons for consistency
+                )
+            }.mapValues { it.value.size } // Count occurrences
+
+            // Display each unique item with its quantity
+            groupedItems.forEach { (key, quantity) ->
+                val (details, menuId, addonsKey) = key
+                // Find the first matching item (all in group have same properties)
+                val representativeItem = order.orderItem.first { item ->
+                    item.details == details &&
+                            item.menu.id == menuId &&
+                            item.addOns.sortedBy { it.id }.joinToString(",") { it.id.toString() } == addonsKey
+                }
+                MyOrderItem(representativeItem, quantity)
+            }
+        }
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            text = "Total: " + NumberFormat.getCurrencyInstance(Locale("in", "ID"))
+                .format(order.totalPrice),
+            fontWeight = FontWeight.Medium,
+            color = HeadingGray,
+            fontSize = 16.sp
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+@Composable
+fun MyOrderHeading(
+    order: Order
+) {
+    val statusMessage = when (order.status) {
+        OrderStatus.CANCELED -> "Pesanan Dibatalkan Oleh Penjual"
+        OrderStatus.WAITING -> "Menunggu Konfirmasi Penjual"
+        OrderStatus.PROCESSING -> "Pesanan Diproses"
+        OrderStatus.FINISHED -> "Pesanan Selesai"
+        else -> "Order status tidak diketahui"
+    }
+
+    val statusProgress = when (order.status) {
+        OrderStatus.WAITING -> 1
+        OrderStatus.PROCESSING -> 2
+        OrderStatus.FINISHED -> 3
+        else -> 0
+    }
+
     Column(
         modifier = Modifier.padding(horizontal = 16.dp),
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = statusMessage,
-            fontSize = 20.sp,
+            fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = HeadingGray
         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Estimasi selesai: " + orders.estimationTime + " - " + (orders.estimationTime + 5) + " menit",
-            fontSize = 12.sp,
+            text = "Estimasi selesai: " + order.estimationTime + " - " + (order.estimationTime + 10) + " menit",
+            fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             color = HeadingGray
         )
@@ -279,14 +468,17 @@ fun MyOrderHeading() {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun MyOrderItem(orderItem: OrderItem) {
+fun MyOrderItem(orderItem: OrderItem, quantity: Int) {
     Row(
-        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max).padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         GlideImage(
             model = orderItem.menu.imageUrl,
-            contentDescription = "Burger",
+            contentDescription = orderItem.menu.name,
             modifier = Modifier
                 .size(100.dp)
                 .clip(RoundedCornerShape(10.dp)),
@@ -303,7 +495,9 @@ fun MyOrderItem(orderItem: OrderItem) {
             })
         )
         Column(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
@@ -323,7 +517,7 @@ fun MyOrderItem(orderItem: OrderItem) {
                             .background(EatzyOrange, shape = CircleShape)
                     ) {
                         Text(
-                            text = "1",
+                            text = quantity.toString(),
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp,
@@ -332,7 +526,7 @@ fun MyOrderItem(orderItem: OrderItem) {
                     }
                     Text(
                         text = orderItem.menu.name,
-                        fontSize = 13.sp,
+                        fontSize = 16.sp,
                         lineHeight = 13.sp,
                         fontWeight = FontWeight.Medium,
                         color = HeadingGray,
@@ -340,12 +534,13 @@ fun MyOrderItem(orderItem: OrderItem) {
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                
+
                 Spacer(Modifier.width(4.dp))
 
                 Text(
-                    text = NumberFormat.getCurrencyInstance(Locale("in", "ID")).format(orderItem.menu.menuPrice),
-                    fontSize = 13.sp,
+                    text = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
+                        .format(orderItem.menu.price),
+                    fontSize = 16.sp,
                     color = HeadingGray
                 )
             }
@@ -353,11 +548,11 @@ fun MyOrderItem(orderItem: OrderItem) {
 //                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
-                    text = orderItem.addOns.joinToString(", ") { addon -> addon.name },
-                    fontSize = 12.sp,
+                    text = orderItem.addOns.joinToString(", ") { it.name },
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = HeadingLightGray,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
                 Row(
@@ -365,18 +560,20 @@ fun MyOrderItem(orderItem: OrderItem) {
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Icon(
-                        modifier = Modifier.size(20.dp).padding(end = 4.dp),
+                        modifier = Modifier
+                            .size(20.dp)
+                            .padding(end = 4.dp),
                         imageVector = Icons.Filled.Assignment,
-                        contentDescription = "Description",
+                        contentDescription = "Deskripsi",
                         tint = HeadingGray
                     )
                     Text(
                         text = orderItem.details,
-                        fontSize = 12.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = HeadingLightGray,
-                        lineHeight = 12.sp,
-                        maxLines = 2,
+                        lineHeight = 1.em,
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -384,6 +581,7 @@ fun MyOrderItem(orderItem: OrderItem) {
         }
 
     }
+
 }
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -391,6 +589,8 @@ fun MyOrderItem(orderItem: OrderItem) {
 fun MyOrderPreview() {
     MyOrderScreen(
         modifier = Modifier,
-        navController = rememberNavController()
+        navController = rememberNavController(),
+        onNavigateup = {},
+        orderId = 1,
     )
 }

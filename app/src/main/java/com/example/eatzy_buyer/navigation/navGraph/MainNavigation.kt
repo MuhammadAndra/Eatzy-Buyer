@@ -28,17 +28,24 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
     composable<History>{
         HistoryScreen(
             navController = navController,
-            onNavigateToMyOrder = { navController.navigate(MyOrder) }
+            onNavigateToMyOrder = { orderId ->
+                navController.navigate(
+                    MyOrder(orderId)
+                )
+            }
         )
     }
     composable<Cart>{
         CartScreen(
             navController = navController,
-            onNavigateToMyOrder = { navController.navigate(MyOrder) }
+            onNavigateToMyOrder = { navController.navigate(MyOrder(1)) }
         )
     }
     composable<Favorite>{
-        FavoriteScreen(navController = navController)
+        FavoriteScreen(
+            navController = navController,
+            onNavigateToOrder = { navController.navigate(Cart) }
+        )
     }
     composable<Profile>{
         ProfileScreen(navController = navController)

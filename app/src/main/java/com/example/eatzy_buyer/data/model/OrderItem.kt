@@ -1,9 +1,20 @@
 package com.example.eatzy_buyer.data.model
 
+import com.google.gson.annotations.SerializedName
+
 data class OrderItem(
-    val id: Int,
-    val orderId: Int,
-    val menu: Menu,
-    val details: String,
-    val addOns: List<AddOn>,
+    @SerializedName("order_item_id")
+    val id: Int = 0,
+
+    @SerializedName("order_id")
+    val orderId: Int = 0,
+
+    @SerializedName("menu")
+    val menu: Menu = Menu(),
+
+    @SerializedName("item_details")
+    val details: String = "",
+
+    @SerializedName("addons")
+    val addOns: List<AddOn> = emptyList(),
 )

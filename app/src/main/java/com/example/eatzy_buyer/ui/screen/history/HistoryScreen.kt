@@ -32,6 +32,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,7 +43,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -54,150 +59,210 @@ import com.example.eatzy_buyer.data.model.Order
 import com.example.eatzy_buyer.data.model.OrderBadge
 import com.example.eatzy_buyer.data.model.OrderItem
 import com.example.eatzy_buyer.data.model.OrderStatus
+import com.example.eatzy_buyer.token
 import com.example.eatzy_buyer.ui.components.BottomNavBar
+import com.example.eatzy_buyer.ui.components.TopBar
+import com.example.eatzy_buyer.ui.screen.myOrder.MyOrderItem
+import com.example.eatzy_buyer.ui.screen.test.HistoryViewModel
+import com.example.eatzy_buyer.ui.screen.test.MyOrderViewModel
+import com.example.eatzy_buyer.ui.theme.EatzyOrange
+import com.example.eatzy_buyer.ui.theme.HeadingGray
+import com.example.eatzy_buyer.ui.theme.HeadingLightGray
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-val EatzyOrange = Color(0xFFFC9824)
-val HeadingGray = Color(0xFF675E5E)
-val HeadingLightGray = Color(0xFF8F8F8F)
-
-private val exampleOrders = listOf(
-    Order(
-        id = 1,
-        buyerId = 1,
-        canteen = Canteen(
-            id = 1,
-            name = "Kantin Pak Muklis"
-        ),
-        status = OrderStatus.FINISHED,
-        orderTime = "2025-05-06 14:23:45",
-        finishedTime = "2025-05-06 14:23:45",
-        scheduleTime = "2025-05-06 14:23:45",
-        estimationTime = 5,
-        totalPrice = 12000.0,
-        orderItem = listOf(
-            OrderItem(
-                id = 2,
-                orderId = 1,
-                details = "Digoreng tidak usah matang",
-                menu = Menu(
-                    id = 2,
-                    name = "Pecel lele",
-                    preparationTime = 7,
-                    imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-                    isAvailable = true,
-                    addOnCategoryId = emptyList(),
-                    menuPrice = 5000.00
-                ),
-                addOns = listOf(
-                    AddOn(
-                        id = 1,
-                        menuId = 2,
-                        name = "Mendoan",
-                        price = 12000.00
-                    ),
-                    AddOn(
-                        id = 2,
-                        menuId = 2,
-                        name = "Cabe",
-                        price = 12000.00
-                    ),
-                )
-            ),
-        )
-    ),
-    Order(
-        id = 1,
-        buyerId = 1,
-        canteen = Canteen(
-            id = 1,
-            name = "Kantin Pak Muklis"
-        ),
-        status = OrderStatus.PROCESSING,
-        orderTime = "2025-05-06 14:23:45",
-        finishedTime = "2025-05-06 14:23:45",
-        scheduleTime = "2025-05-06 14:23:45",
-        estimationTime = 5,
-        totalPrice = 12000.0,
-        orderItem = listOf(
-            OrderItem(
-                id = 1,
-                orderId = 1,
-                details = "Digoreng sampe matang banget tolong jangan sampai ada yang mentah sedikitpun",
-                menu = Menu(
-                    id = 1,
-                    name = "Ayam mbakar wong soloz Ayam mbakar wong soloz",
-                    preparationTime = 4,
-                    imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-                    isAvailable = true,
-                    addOnCategoryId = emptyList(),
-                    menuPrice = 5000.00
-                ),
-                addOns = listOf(
-                    AddOn(
-                        id = 1,
-                        menuId = 1,
-                        name = "Mendoan",
-                        price = 12000.00
-                    ),
-                    AddOn(
-                        id = 2,
-                        menuId = 1,
-                        name = "Cabe",
-                        price = 12000.00
-                    ),
-                )
-            ),
-            OrderItem(
-                id = 2,
-                orderId = 1,
-                details = "Digoreng tidak usah matang",
-                menu = Menu(
-                    id = 2,
-                    name = "Pecel lele",
-                    preparationTime = 7,
-                    imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-                    isAvailable = true,
-                    addOnCategoryId = emptyList(),
-                    menuPrice = 5000.00
-                ),
-                addOns = listOf(
-                    AddOn(
-                        id = 1,
-                        menuId = 2,
-                        name = "Mendoan",
-                        price = 12000.00
-                    ),
-                    AddOn(
-                        id = 2,
-                        menuId = 2,
-                        name = "Cabe",
-                        price = 12000.00
-                    ),
-                )
-            ),
-        )
-    ),
-
-    )
-
-private val orders = exampleOrders;
+//private val exampleOrders = listOf(
+//    Order(
+//        id = 1,
+//        buyerId = 1,
+//        canteen = Canteen(
+//            id = 1,
+//            name = "Kantin Pak Muklis"
+//        ),
+//        status = OrderStatus.FINISHED,
+//        orderTime = "2025-05-06 14:23:45",
+//        finishedTime = "2025-05-06 14:23:45",
+//        scheduleTime = "2025-05-06 14:23:45",
+//        estimationTime = 5,
+//        totalPrice = 12000.0,
+//        orderItem = listOf(
+//            OrderItem(
+//                id = 2,
+//                orderId = 1,
+//                details = "Digoreng tidak usah matang",
+//                menu = Menu(
+//                    id = 2,
+//                    name = "Pecel lele",
+//                    preparationTime = 7,
+//                    imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
+//                    isAvailable = true,
+//                    addOnCategoryId = emptyList(),
+//                    price = 5000.00
+//                ),
+//                addOns = listOf(
+//                    AddOn(
+//                        id = 1,
+//                        menuId = 2,
+//                        name = "Mendoan",
+//                        price = 12000.00
+//                    ),
+//                    AddOn(
+//                        id = 2,
+//                        menuId = 2,
+//                        name = "Cabe",
+//                        price = 12000.00
+//                    ),
+//                )
+//            ),
+//        )
+//    ),
+//    Order(
+//        id = 1,
+//        buyerId = 1,
+//        canteen = Canteen(
+//            id = 1,
+//            name = "Kantin Pak Muklis"
+//        ),
+//        status = OrderStatus.PROCESSING,
+//        orderTime = "2025-05-06 14:23:45",
+//        finishedTime = "2025-05-06 14:23:45",
+//        scheduleTime = "2025-05-06 14:23:45",
+//        estimationTime = 5,
+//        totalPrice = 12000.0,
+//        orderItem = listOf(
+//            OrderItem(
+//                id = 1,
+//                orderId = 1,
+//                details = "Digoreng sampe matang banget tolong jangan sampai ada yang mentah sedikitpun",
+//                menu = Menu(
+//                    id = 1,
+//                    name = "Ayam mbakar wong soloz Ayam mbakar wong soloz",
+//                    preparationTime = 4,
+//                    imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
+//                    isAvailable = true,
+//                    addOnCategoryId = emptyList(),
+//                    price = 5000.00
+//                ),
+//                addOns = listOf(
+//                    AddOn(
+//                        id = 1,
+//                        menuId = 1,
+//                        name = "Mendoan",
+//                        price = 12000.00
+//                    ),
+//                    AddOn(
+//                        id = 2,
+//                        menuId = 1,
+//                        name = "Cabe",
+//                        price = 12000.00
+//                    ),
+//                )
+//            ),
+//            OrderItem(
+//                id = 2,
+//                orderId = 1,
+//                details = "Digoreng tidak usah matang",
+//                menu = Menu(
+//                    id = 2,
+//                    name = "Pecel lele",
+//                    preparationTime = 7,
+//                    imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
+//                    isAvailable = true,
+//                    addOnCategoryId = emptyList(),
+//                    price = 5000.00
+//                ),
+//                addOns = listOf(
+//                    AddOn(
+//                        id = 1,
+//                        menuId = 2,
+//                        name = "Mendoan",
+//                        price = 12000.00
+//                    ),
+//                    AddOn(
+//                        id = 2,
+//                        menuId = 2,
+//                        name = "Cabe",
+//                        price = 12000.00
+//                    ),
+//                )
+//            ),
+//        )
+//    ),
+//    Order(
+//        id = 1,
+//        buyerId = 1,
+//        canteen = Canteen(
+//            id = 1,
+//            name = "Kantin Pak Muklis"
+//        ),
+//        status = OrderStatus.FINISHED,
+//        orderTime = "2025-05-06 14:23:45",
+//        finishedTime = "2025-05-06 14:23:45",
+//        scheduleTime = "2025-05-06 14:23:45",
+//        estimationTime = 5,
+//        totalPrice = 12000.0,
+//        orderItem = listOf(
+//            OrderItem(
+//                id = 2,
+//                orderId = 1,
+//                details = "Digoreng tidak usah matang",
+//                menu = Menu(
+//                    id = 2,
+//                    name = "Pecel lele",
+//                    preparationTime = 7,
+//                    imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
+//                    isAvailable = true,
+//                    addOnCategoryId = emptyList(),
+//                    price = 5000.00
+//                ),
+//                addOns = listOf(
+//                    AddOn(
+//                        id = 1,
+//                        menuId = 2,
+//                        name = "Mendoan",
+//                        price = 12000.00
+//                    ),
+//                    AddOn(
+//                        id = 2,
+//                        menuId = 2,
+//                        name = "Cabe",
+//                        price = 12000.00
+//                    ),
+//                )
+//            ),
+//        )
+//    ),
+//
+//    )
+//
+//private val orders = exampleOrders;
 
 
 @Composable
 fun HistoryScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    onNavigateToMyOrder: () -> Unit
+    onNavigateToMyOrder: (Int) -> Unit
 ) {
 
-    Scaffold(bottomBar = { BottomNavBar(navController) }) { innerPadding ->
+    val vm: HistoryViewModel = viewModel()
+    val orders by vm.orders.collectAsStateWithLifecycle(emptyList())
+
+    LaunchedEffect(Unit) {
+        vm.fetchOrdersByBuyerResponse(token = token)
+    }
+
+    Scaffold(
+        bottomBar = { BottomNavBar(navController) },
+        topBar = { TopBar(
+            modifier = Modifier,
+            title = "History"
+        ) }
+    ) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
             Box(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
@@ -228,7 +293,7 @@ fun HistoryScreen(
 
 @Composable
 fun OrderHistory(
-    onNavigateToMyOrder: () -> Unit,
+    onNavigateToMyOrder: (Int) -> Unit,
     order: Order
 ) {
 
@@ -268,14 +333,6 @@ fun OrderHistory(
         else -> "Pesan Lagi"
     }
 
-    val orderStatusMessage = when (order.status) {
-        OrderStatus.CANCELED -> "Dibatalkan"
-        OrderStatus.WAITING -> "Menunggu Konfirmasi"
-        OrderStatus.PROCESSING -> "Diproses"
-        OrderStatus.FINISHED -> "Selesai"
-        else -> ""
-    }
-
     ElevatedCard(
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
@@ -304,17 +361,17 @@ fun OrderHistory(
                         ).parse("2025-05-06 14:23:45")
                     ),
                     fontWeight = FontWeight.Medium,
+                    lineHeight = 1.em,
                     color = HeadingGray,
-                    fontSize = 10.sp
+                    fontSize = 13.sp
                 )
                 Text(
                     text = order.canteen.name,
                     fontWeight = FontWeight.Bold,
                     color = HeadingGray,
-                    fontSize = 12.sp
+                    fontSize = 16.sp
                 )
             }
-
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -323,40 +380,68 @@ fun OrderHistory(
                 Label(orderBadge.text, orderBadge.textColor, orderBadge.backgroundColor )
             }
 
-
         }
 
+        Column {
+            // Group items by a composite key (details + menu + addons)
+            val groupedItems = order.orderItem.groupBy { item ->
+                // Create a key combining all 3 conditions
+                Triple(
+                    item.details,
+                    item.menu.id,  // Assuming Menu has an ID; adjust if needed
+                    item.addOns.sortedBy { it.id }.joinToString(",") { it.id.toString() } // Sort addons for consistency
+                )
+            }.mapValues { it.value.size } // Count occurrences
 
-        order.orderItem.forEach { orderItem ->
-            HistoryItem(orderItem)
+            // Display each unique item with its quantity
+            groupedItems.forEach { (key, quantity) ->
+                val (details, menuId, addonsKey) = key
+                // Find the first matching item (all in group have same properties)
+                val representativeItem = order.orderItem.first { item ->
+                    item.details == details &&
+                            item.menu.id == menuId &&
+                            item.addOns.sortedBy { it.id }.joinToString(",") { it.id.toString() } == addonsKey
+                }
+                HistoryItem(representativeItem, quantity)
+            }
         }
+
+//        order.orderItem.forEach { orderItem ->
+//            HistoryItem(orderItem)
+//        }
 //                    Spacer(modifier = Modifier.height(8.dp))
-        Column(
-            modifier = Modifier.padding(top = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(0.dp)
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = order.orderItem.count().toString() + " Menu",
-                color = HeadingGray,
-                fontSize = 12.sp
-            )
+//        Column(
+//            modifier = Modifier.padding(top = 8.dp),
+//            verticalArrangement = Arrangement.spacedBy(0.dp)
+//        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text(
-                    text = "Total: " + NumberFormat.getCurrencyInstance(Locale("in", "ID"))
-                        .format(order.totalPrice),
-                    fontWeight = FontWeight.Medium,
-                    color = HeadingGray,
-                    fontSize = 13.sp
-                )
+                Column(
+                    modifier = Modifier.padding(top = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(0.dp)
+                ) {
+                    Text(
+                        text = order.orderItem.count().toString() + " Menu",
+                        lineHeight = 1.em,
+                        color = HeadingGray,
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = "Total: " + NumberFormat.getCurrencyInstance(Locale("in", "ID"))
+                            .format(order.totalPrice),
+                        fontWeight = FontWeight.Medium,
+                        color = HeadingGray,
+                        fontSize = 16.sp,
+                    )
+                }
+
                 ElevatedButton(
-                    onClick = onNavigateToMyOrder,
+                    onClick = { onNavigateToMyOrder(order.id) },
                     modifier = Modifier.height(28.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
                     elevation = ButtonDefaults.buttonElevation(
@@ -374,10 +459,10 @@ fun OrderHistory(
                     )
                 }
             }
-        }
+//        }
 
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
@@ -385,13 +470,14 @@ fun OrderHistory(
 fun Label(text: String, textColor: Color, backgroundColor: Color) {
     Box(
         modifier = Modifier
-            .background(color = backgroundColor, shape = RoundedCornerShape(4.dp))
-            .padding(horizontal = 4.dp, vertical = 2.dp)
+            .background(color = backgroundColor, shape = RoundedCornerShape(6.dp))
+            .padding(horizontal = 5.dp, vertical = 5.dp)
     ) {
         Text(
             text = text,
             color = textColor,
-            fontSize = 10.sp,
+            fontSize = 14.sp,
+            lineHeight = 1.em,
             fontWeight = FontWeight.Medium
         )
     }
@@ -399,14 +485,17 @@ fun Label(text: String, textColor: Color, backgroundColor: Color) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun HistoryItem(orderItem: OrderItem) {
+fun HistoryItem(orderItem: OrderItem, quantity: Int) {
     Row(
-        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max).padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         GlideImage(
             model = orderItem.menu.imageUrl,
-            contentDescription = "Burger",
+            contentDescription = orderItem.menu.name,
             modifier = Modifier
                 .size(100.dp)
                 .clip(RoundedCornerShape(10.dp)),
@@ -423,7 +512,9 @@ fun HistoryItem(orderItem: OrderItem) {
             })
         )
         Column(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
@@ -443,17 +534,17 @@ fun HistoryItem(orderItem: OrderItem) {
                             .background(EatzyOrange, shape = CircleShape)
                     ) {
                         Text(
-                            text = "1",
+                            text = quantity.toString(),
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp,
-                            lineHeight = 1.sp
+                            lineHeight = 1.em,
                         )
                     }
                     Text(
                         text = orderItem.menu.name,
-                        fontSize = 13.sp,
-                        lineHeight = 13.sp,
+                        fontSize = 16.sp,
+                        lineHeight = 1.em,
                         fontWeight = FontWeight.Medium,
                         color = HeadingGray,
                         maxLines = 2,
@@ -464,8 +555,8 @@ fun HistoryItem(orderItem: OrderItem) {
                 Spacer(Modifier.width(4.dp))
 
                 Text(
-                    text = NumberFormat.getCurrencyInstance(Locale("in", "ID")).format(orderItem.menu.menuPrice),
-                    fontSize = 13.sp,
+                    text = NumberFormat.getCurrencyInstance(Locale("in", "ID")).format(orderItem.menu.price),
+                    fontSize = 16.sp,
                     color = HeadingGray
                 )
             }
@@ -474,7 +565,7 @@ fun HistoryItem(orderItem: OrderItem) {
             ) {
                 Text(
                     text = orderItem.addOns.joinToString(", ") { addon -> addon.name },
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = HeadingLightGray,
                     maxLines = 1,
@@ -485,17 +576,19 @@ fun HistoryItem(orderItem: OrderItem) {
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Icon(
-                        modifier = Modifier.size(20.dp).padding(end = 4.dp),
+                        modifier = Modifier
+                            .size(20.dp)
+                            .padding(end = 4.dp),
                         imageVector = Icons.Filled.Assignment,
-                        contentDescription = "Description",
+                        contentDescription = "Deskripsi",
                         tint = HeadingGray
                     )
                     Text(
                         text = orderItem.details,
-                        fontSize = 12.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = HeadingLightGray,
-                        lineHeight = 12.sp,
+                        lineHeight = 1.em,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
