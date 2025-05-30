@@ -11,9 +11,8 @@ fun NavGraphBuilder.cartGraph(
     composable("cart") {
         CartScreen(
             navController = navController,
-            // Navigasi pakai onCheckoutClick agar bisa pindah ke confirmation
-            onCheckoutClick = {
-                navController.navigate("confirmation")
+            onCheckoutClick = { order_id ->       // <-- ini harus sesuai tipe Int
+                navController.navigate("confirmation/confirmed/$order_id")
             }
         )
     }

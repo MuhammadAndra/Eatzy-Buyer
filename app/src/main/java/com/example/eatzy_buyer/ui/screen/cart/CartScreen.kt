@@ -1,6 +1,5 @@
 package com.example.eatzy_buyer.ui.screen.cart
 
-
 import android.icu.text.NumberFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -35,20 +34,19 @@ import com.example.eatzy_buyer.ui.components.BottomNavBar
 fun CartScreen(
     navController: NavController,
     viewModel: CartViewModel = viewModel(),
-    onCheckoutClick: (Cart) -> Unit
+    onCheckoutClick: (Int) -> Unit
 ) {
     // Observe carts from ViewModel
-    val carts by viewModel.carts.collectAsState()
+    val cart by viewModel.cart.collectAsState()
 
 
     // Fetch carts from API once when this screen is launched
     LaunchedEffect(Unit) {
-        viewModel.fetchCartsFromApi()
+        viewModel.fetchCartFromApi()
     }
 
     Scaffold(
         containerColor = Color.White,
-        bottomBar = { BottomNavBar(navController) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -57,8 +55,18 @@ fun CartScreen(
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF455E84)
                     )
-                }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.White // Ubah warna TopAppBar jadi putih
+                )
             )
+        },
+        bottomBar = {
+            Surface(
+                color = Color.White, // Ubah warna BottomBar jadi putih
+                ) {
+                BottomNavBar(navController)
+            }
         }
     ) { innerPadding ->
         Column(
@@ -73,13 +81,11 @@ fun CartScreen(
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
             ) {
-                items(carts) { cart ->
-                    CartCard(
-                        cart = cart,
-                        onCheckoutClick = {
-                            onCheckoutClick(cart)
+                items(cart) { cart ->
+                    CartCard(cart = cart) { order_id ->
+                        navController.navigate("confirmation/confirmed/$order_id")
                         }
-                    )
+
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
@@ -92,8 +98,12 @@ fun CartScreen(
 @Composable
 fun CartCard(
     cart: Cart,
-    onCheckoutClick: () -> Unit
+    onCheckoutClick: (Int) -> Unit // menerima orderId
 ) {
+    val groupedItems = remember(cart.items) {
+        cart.items.groupBy { Triple(it.menu_id, it.note ?: "", it.addons.joinToString()) }
+    }
+
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.fillMaxWidth(),
@@ -120,13 +130,16 @@ fun CartCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            cart.items.forEach { item ->
+            groupedItems.forEach { (_, grouped) ->
+                val itemRepresentative = grouped.first()
+                val quantity = grouped.size
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     GlideImage(
-                        model = item.menu_image,
+                        model = itemRepresentative.menu_image,
                         contentDescription = "Item Image",
                         modifier = Modifier
                             .size(100.dp)
@@ -145,7 +158,7 @@ fun CartCard(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "${item.quantity}",
+                                    text = "$quantity",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = Color.White
                                 )
@@ -154,7 +167,7 @@ fun CartCard(
                             Spacer(modifier = Modifier.width(6.dp))
 
                             Text(
-                                text = item.menu_name,
+                                text = itemRepresentative.menu_name,
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -162,16 +175,16 @@ fun CartCard(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        if (item.addons.isNotEmpty()) {
+                        if (itemRepresentative.addons.isNotEmpty()) {
                             Text(
-                                text = item.addons.joinToString(separator = ", "),
+                                text = itemRepresentative.addons.joinToString(separator = ", "),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.DarkGray
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                         }
 
-                        if (!item.note.isNullOrEmpty()) {
+                        if (!itemRepresentative.note.isNullOrEmpty()) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Default.Assignment,
@@ -183,7 +196,7 @@ fun CartCard(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = item.note,
+                                    text = itemRepresentative.note,
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -191,7 +204,7 @@ fun CartCard(
                         }
 
                         Text(
-                            formatRupiah(item.menu_price.toDouble()),
+                            formatRupiah(itemRepresentative.menu_price.toDouble()),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -217,10 +230,13 @@ fun CartCard(
                     )
                 }
                 Button(
-                    onClick = onCheckoutClick,
+                    onClick = { onCheckoutClick(cart.order_id) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFC9824))
                 ) {
-                    Text("Checkout")
+                    Text(
+                        text = "Checkout",
+                        color = Color.White
+                    )
                 }
             }
         }

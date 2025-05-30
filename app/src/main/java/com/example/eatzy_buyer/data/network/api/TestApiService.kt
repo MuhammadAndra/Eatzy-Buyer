@@ -10,7 +10,4 @@ interface TestApiService {
     @GET("/users")
     fun getUsers(): Call<List<User>>
 
-    @GET("/cart")
-    fun getCart(): Call<List<Cart>>
-
 }

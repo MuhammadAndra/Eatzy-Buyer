@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     kotlin("plugin.serialization") version "2.0.21"
+    kotlin("kapt")
 }
 
 android {
@@ -80,6 +81,8 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.github.bumptech.glide:compiler:4.15.1")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

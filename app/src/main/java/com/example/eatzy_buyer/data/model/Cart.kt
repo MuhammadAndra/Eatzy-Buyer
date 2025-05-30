@@ -15,7 +15,8 @@ data class CartItem(
 
 @Serializable
 data class Cart(
-    val order_id: Int,              // dari orders.order_id
+    val order_id: Int,
+    //val buyer_id: Int,// dari orders.order_id
     val canteen_name: String,       // dari canteens.canteen_name
     val items: List<CartItem>,      // mapping dari order_items
     val total_price: Double         // dari orders.total_price

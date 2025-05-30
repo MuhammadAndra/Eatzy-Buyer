@@ -4,54 +4,45 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.eatzy_buyer.data.model.Cart
 import com.example.eatzy_buyer.data.network.RetrofitClient
+import com.example.eatzy_buyer.data.repository.CartRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class CartViewModel : ViewModel() {
 
-    // State untuk menyimpan data cart dari API
-    private val _carts = MutableStateFlow<List<Cart>>(emptyList())
-    val carts: StateFlow<List<Cart>> = _carts
+    private val _cart = MutableStateFlow<List<Cart>>(emptyList())
+    val cart: StateFlow<List<Cart>> = _cart
 
-    // Fungsi untuk memuat data cart dari API
-    fun fetchCartsFromApi() {
-        RetrofitClient.testApi.getCart().enqueue(object : Callback<List<Cart>> {
-            override fun onResponse(call: Call<List<Cart>>, response: Response<List<Cart>>) {
-                if (response.isSuccessful) {
-                    _carts.value = response.body() ?: emptyList()
-                    Log.d("CartViewModel", "Loaded carts: ${response.body()}")
-                } else {
-                    Log.e("CartViewModel", "Failed to load carts: ${response.code()}")
-                }
-            }
+    // Ganti token dengan milikmu yang valid
+    private val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJqYWVAZ21haWwuY29tIiwicm9sZSI6ImJ1eWVyIiwiaWF0IjoxNzQ4NTAxMzkxLCJleHAiOjE3NjQwNTMzOTF9.u-wWG5HUz9fUOj2KhYDjm8SjjjCzdT9yeqqFW_ezzlo"
+    private val repository = CartRepository(RetrofitClient.cartApi)
 
-            override fun onFailure(call: Call<List<Cart>>, t: Throwable) {
-                Log.e("CartViewModel", "Error loading carts: ${t.message}")
+    fun fetchCartFromApi() {
+        repository.fetchCart(token,
+            onSuccess = { cart ->
+                _cart.value = cart
+                Log.d("CartViewModel", "Carts loaded: $cart")
+            },
+            onError = { error ->
+                Log.e("CartViewModel", "Fetch failed: ${error.message ?: "Unknown error"}")
             }
-        })
+        )
     }
 
-    // Menghitung total semua cart
     fun getTotalPrice(): Double {
-        return _carts.value.sumOf { it.total_price }
+        return _cart.value.sumOf { it.total_price }
     }
 
-    // Menghapus semua cart (lokal)
     fun clearCart() {
-        _carts.value = emptyList()
+        _cart.value = emptyList()
     }
 
-    // Menghapus satu cart berdasarkan order_id
     fun removeCart(cart: Cart) {
-        _carts.value = _carts.value.filterNot { it.order_id == cart.order_id }
+        _cart.value = _cart.value.filterNot { it.order_id == cart.order_id }
     }
 
-    // Memperbarui data cart lokal
     fun updateCart(updatedCart: Cart) {
-        _carts.value = _carts.value.map {
+        _cart.value = _cart.value.map {
             if (it.order_id == updatedCart.order_id) updatedCart else it
         }
     }

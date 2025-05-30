@@ -28,11 +28,12 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
     composable<History>{
         HistoryScreen(navController = navController)
     }
-    composable<Cart>{
-        CartScreen(navController = navController, onCheckoutClick = {
-            navController.navigate("confirmation")
+    composable<Cart> {
+        CartScreen(navController = navController, onCheckoutClick = { order_id ->
+            navController.navigate("confirmation/confirmed/$order_id")
         })
     }
+
     composable<Favorite>{
         FavoriteScreen(navController = navController)
     }
