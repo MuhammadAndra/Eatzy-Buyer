@@ -32,6 +32,11 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 navController.navigate(
                     MyOrder(orderId)
                 )
+            },
+            onNavigateToCart = { orderId ->
+                navController.navigate(
+                    MyOrder(orderId)
+                )
             }
         )
     }

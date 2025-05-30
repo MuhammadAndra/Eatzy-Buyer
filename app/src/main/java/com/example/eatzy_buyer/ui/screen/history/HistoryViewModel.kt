@@ -12,6 +12,7 @@ class HistoryViewModel : ViewModel() {
     private val repository = OrderRepository()
 
     private val _orders = MutableStateFlow<List<Order>>(emptyList())
+
     val orders: StateFlow<List<Order>> = _orders
 
     suspend fun fetchOrdersByBuyerResponse(token: String) {
@@ -22,12 +23,21 @@ class HistoryViewModel : ViewModel() {
         }
     }
 
-//    ini fungsi ambil data dari pak aryo
-//    fun fetchUsers(token: String) {
-//        repository.getUsers(
-//            token = token,
-//            onSuccess = { _users.value = it },
-//            onError = { throwable -> }
-//        )
-//    }
+    private val _duplicatedOrderId = MutableStateFlow<Int?>(null)
+    val duplicatedOrderId: StateFlow<Int?> = _duplicatedOrderId
+
+    fun clearDuplicatedOrderId() {
+        _duplicatedOrderId.value = null
+    }
+
+    suspend fun duplicateOrderByIdResplonse(token: String, orderId: Int) {
+        val response = repository.duplicateOrderByIdResponse(token, orderId)
+        if (response.isSuccessful) {
+            val newOrderId = response.body() // <-- Update this as per actual response
+            _duplicatedOrderId.value = newOrderId
+        } else {
+            Log.e("DUPLICATE_ERROR", response.errorBody()?.string() ?: "Unknown error")
+        }
+    }
+
 }

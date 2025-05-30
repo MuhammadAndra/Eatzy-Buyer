@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,7 +23,6 @@ import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.SoupKitchen
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.LinearProgressIndicator
@@ -35,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,9 +53,7 @@ import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
-import com.example.eatzy_buyer.data.model.AddOn
-import com.example.eatzy_buyer.data.model.Canteen
-import com.example.eatzy_buyer.data.model.Menu
+import com.example.eatzy_buyer.common.OrderUpdateNotifier
 import com.example.eatzy_buyer.data.model.Order
 import com.example.eatzy_buyer.data.model.OrderItem
 import com.example.eatzy_buyer.data.model.OrderStatus
@@ -70,192 +67,7 @@ import com.example.eatzy_buyer.ui.theme.HeadingLightGray
 import java.text.NumberFormat
 import java.util.Locale
 
-private val exampleOrders = Order(
-    id = 1,
-    buyerId = 1,
-    canteen = Canteen(
-        id = 1,
-        name = "Kantin Pak Muklis"
-    ),
-    status = OrderStatus.PROCESSING,
-    orderTime = "2025-05-06 14:23:45",
-    finishedTime = "2025-05-06 14:23:45",
-    scheduleTime = "2025-05-06 14:23:45",
-    estimationTime = 5,
-    totalPrice = 12000.0,
-    orderItem = listOf(
-        OrderItem(
-            id = 1,
-            orderId = 1,
-            details = "Digoreng sampe matang banget tolong jangan sampai ada yang mentah sedikitpun",
-            menu = Menu(
-                id = 1,
-                name = "Ayam mbakar wong soloz Ayam mbakar wong soloz",
-                preparationTime = 4,
-                imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-                isAvailable = true,
-                addOnCategoryId = emptyList(),
-                price = 5000.00
-            ),
-            addOns = listOf(
-                AddOn(
-                    id = 1,
-                    menuId = 1,
-                    name = "Mendoan",
-                    price = 12000.00
-                ),
-                AddOn(
-                    id = 2,
-                    menuId = 1,
-                    name = "Cabe",
-                    price = 12000.00
-                ),
-            )
-        ),
-        OrderItem(
-            id = 2,
-            orderId = 1,
-            details = "Digoreng tidak usah matang",
-            menu = Menu(
-                id = 2,
-                name = "Pecel lele",
-                preparationTime = 7,
-                imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-                isAvailable = true,
-                addOnCategoryId = emptyList(),
-                price = 5000.00
-            ),
-            addOns = listOf(
-                AddOn(
-                    id = 1,
-                    menuId = 2,
-                    name = "Mendoan",
-                    price = 12000.00
-                ),
-                AddOn(
-                    id = 2,
-                    menuId = 2,
-                    name = "Cabe",
-                    price = 12000.00
-                ),
-            )
-        ),
-        OrderItem(
-            id = 2,
-            orderId = 1,
-            details = "Digoreng tidak usah matang",
-            menu = Menu(
-                id = 2,
-                name = "Pecel lele",
-                preparationTime = 7,
-                imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-                isAvailable = true,
-                addOnCategoryId = emptyList(),
-                price = 5000.00
-            ),
-            addOns = listOf(
-                AddOn(
-                    id = 1,
-                    menuId = 2,
-                    name = "Mendoan",
-                    price = 12000.00
-                ),
-                AddOn(
-                    id = 2,
-                    menuId = 2,
-                    name = "Cabe",
-                    price = 12000.00
-                ),
-            )
-        ),
-        OrderItem(
-            id = 2,
-            orderId = 1,
-            details = "Digoreng tidak usah matang",
-            menu = Menu(
-                id = 2,
-                name = "Pecel lele",
-                preparationTime = 7,
-                imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-                isAvailable = true,
-                addOnCategoryId = emptyList(),
-                price = 5000.00
-            ),
-            addOns = listOf(
-                AddOn(
-                    id = 1,
-                    menuId = 2,
-                    name = "Mendoan",
-                    price = 12000.00
-                ),
-                AddOn(
-                    id = 2,
-                    menuId = 2,
-                    name = "Cabe",
-                    price = 12000.00
-                ),
-            )
-        ),
-        OrderItem(
-            id = 2,
-            orderId = 1,
-            details = "Digoreng tidak usah matang",
-            menu = Menu(
-                id = 2,
-                name = "Pecel lele",
-                preparationTime = 7,
-                imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-                isAvailable = true,
-                addOnCategoryId = emptyList(),
-                price = 5000.00
-            ),
-            addOns = listOf(
-                AddOn(
-                    id = 1,
-                    menuId = 2,
-                    name = "Mendoan",
-                    price = 12000.00
-                ),
-                AddOn(
-                    id = 2,
-                    menuId = 2,
-                    name = "Cabe",
-                    price = 12000.00
-                ),
-            )
-        ),
-        OrderItem(
-            id = 2,
-            orderId = 1,
-            details = "Digoreng tidak usah matang",
-            menu = Menu(
-                id = 2,
-                name = "Pecel lele",
-                preparationTime = 7,
-                imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-                isAvailable = true,
-                addOnCategoryId = emptyList(),
-                price = 5000.00
-            ),
-            addOns = listOf(
-                AddOn(
-                    id = 1,
-                    menuId = 2,
-                    name = "Mendoan",
-                    price = 12000.00
-                ),
-                AddOn(
-                    id = 2,
-                    menuId = 2,
-                    name = "Cabe",
-                    price = 12000.00
-                ),
-            )
-        ),
-    )
-)
 
-//private val order = exampleOrders;
 
 @Composable
 fun MyOrderScreen(
@@ -267,6 +79,11 @@ fun MyOrderScreen(
 
     val vm: MyOrderViewModel = viewModel()
     val order by vm.order.collectAsStateWithLifecycle(Order())
+    val trigger by OrderUpdateNotifier.trigger.collectAsState()
+
+    LaunchedEffect(trigger) {
+        vm.fetchOrdersByIdResponse(token = token, orderId = orderId)
+    }
 
     LaunchedEffect(Unit) {
         vm.fetchOrdersByIdResponse(token = token, orderId = orderId)
@@ -382,6 +199,7 @@ fun MyOrderHeading(
         OrderStatus.WAITING -> "Menunggu Konfirmasi Penjual"
         OrderStatus.PROCESSING -> "Pesanan Diproses"
         OrderStatus.FINISHED -> "Pesanan Selesai"
+        OrderStatus.INCART -> "Pesanan Dalam Keranjang"
         else -> "Order status tidak diketahui"
     }
 

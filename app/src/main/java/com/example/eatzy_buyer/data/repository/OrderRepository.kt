@@ -14,4 +14,8 @@ class OrderRepository {
         return RetrofitClient.orderApi.getOrdersByIdResponse(token = "Bearer $token", orderId = orderId)
     }
 
+    suspend fun duplicateOrderByIdResponse(token: String, orderId: Int): Response<Int> {
+        return RetrofitClient.orderApi.duplicateOrderByIdResponse(token = "Bearer $token", orderId = orderId)
+    }
+
 }

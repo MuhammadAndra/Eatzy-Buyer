@@ -39,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -81,61 +83,6 @@ import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
-val menusExample = listOf(
-    Menu(
-        id = 1,
-        name = "Ayam mbakar wong soloz Ayam mbakar wong soloz",
-        category = MenuCategory(
-            id = 1,
-            name = "Ayam",
-            canteen = Canteen(
-                id = 1,
-                name = "Kantin Bu Ridok"
-            )
-        ),
-        preparationTime = 4,
-        imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-        isAvailable = true,
-        addOnCategoryId = emptyList(),
-        price = 5000.00
-    ),
-    Menu(
-        id = 2,
-        name = "Tempe kecap pak budi masak seger",
-        category = MenuCategory(
-            id = 1,
-            name = "Ayam",
-            canteen = Canteen(
-                id = 2,
-                name = "Kantin Pak Bagus"
-            )
-        ),
-        preparationTime = 7,
-        imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-        isAvailable = true,
-        addOnCategoryId = emptyList(),
-        price = 12000.00
-    ),
-    Menu(
-        id = 1,
-        name = "Sop Ayamz pak kremes enak banget",
-        category = MenuCategory(
-            id = 1,
-            name = "Ayam",
-            canteen = Canteen(
-                id = 3,
-                name = "Kantin Pak Bonang"
-            )
-        ),
-        preparationTime = 8,
-        imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-        isAvailable = true,
-        addOnCategoryId = emptyList(),
-        price = 8000.00
-    ),
-)
-
-val menus = menusExample
 
 @Composable
 fun FavoriteScreen(
@@ -149,15 +96,10 @@ fun FavoriteScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val vm: FavoriteViewModel = viewModel()
-//    val users by vm.users.collectAsStateWithLifecycle()
     val favorites by vm.favorites.collectAsStateWithLifecycle(emptyList())
 
     LaunchedEffect(Unit) {
         vm.fetchFavoritesResponse(token = token)
-//        Log.d("FavoriteScreen", "Favorites updated: ${favorites.size}")
-//        favorites.forEach {
-//            Log.d("FavoriteScreen", "Favorite item: $it")
-//        }
     }
 
 
@@ -170,7 +112,10 @@ fun FavoriteScreen(
                 searchQuery = searchQuery,
                 onSearchQueryChange = { searchQuery = it },
                 isSearching = isSearching,
-                onToggleSearch = { isSearching = !isSearching }
+                onToggleSearch = {
+                    isSearching = !isSearching
+                    searchQuery = ""
+                }
             )
         }
     ) { innerPadding ->
@@ -199,7 +144,8 @@ fun FavoriteScreen(
                     favorite,
                     onNavigateToOrder,
                     vm = vm,
-                    coroutineScope = coroutineScope
+                    coroutineScope = coroutineScope,
+                    token = token
                 )
             }
             item {
@@ -216,7 +162,8 @@ fun FavoriteItemCard(
     favorite: Menu,
     onNavigateToOrder: () -> Unit,
     vm: FavoriteViewModel,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    token: String?
 ) {
     var showDeleteConfirmation by remember { mutableStateOf(false) }
 
@@ -225,7 +172,9 @@ fun FavoriteItemCard(
             onConfirmation = {
                 showDeleteConfirmation = false // Close dialog
                 coroutineScope.launch {
-                    vm.deleteFavorite(token, favorite.id)
+                    if (token != null) {
+                        vm.deleteFavorite(token, favorite.id)
+                    }
                 }
             },
             onDismissRequest = { showDeleteConfirmation = false },

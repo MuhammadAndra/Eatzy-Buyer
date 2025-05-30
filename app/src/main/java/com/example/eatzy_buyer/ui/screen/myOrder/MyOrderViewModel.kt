@@ -1,18 +1,22 @@
 package com.example.eatzy_buyer.ui.screen.test
 
+import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import com.example.eatzy_buyer.data.model.Order
 import com.example.eatzy_buyer.data.repository.OrderRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class MyOrderViewModel : ViewModel() {
+class MyOrderViewModel() : ViewModel() {
 
     private val repository = OrderRepository()
 
     private val _order = MutableStateFlow<Order>(Order())
     val order: StateFlow<Order> = _order
+
 
     suspend fun fetchOrdersByIdResponse(token: String, orderId: Int) {
         val response = repository.getOrdersByIdResponse(token = token, orderId = orderId)

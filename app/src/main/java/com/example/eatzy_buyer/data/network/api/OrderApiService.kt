@@ -1,14 +1,10 @@
 package com.example.eatzy_buyer.data.network.api
 
-import com.example.eatzy_buyer.data.model.Menu
-import com.example.eatzy_buyer.data.model.MenuFavorite
 import com.example.eatzy_buyer.data.model.Order
-import com.example.eatzy_buyer.data.model.User
-import retrofit2.Call
 import retrofit2.Response
-import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface OrderApiService {
@@ -22,5 +18,11 @@ interface OrderApiService {
         @Header("authorization") token: String,
         @Path("id") orderId: Int
     ): Response<Order>
+
+    @POST("/orders/duplicate/{id}")
+    suspend fun duplicateOrderByIdResponse(
+        @Header("authorization") token: String,
+        @Path("id") orderId: Int
+    ): Response<Int>
 
 }

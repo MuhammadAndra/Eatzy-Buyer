@@ -1,6 +1,7 @@
 package com.example.eatzy_buyer.ui.screen.history
 
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -33,7 +33,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,9 +54,7 @@ import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
-import com.example.eatzy_buyer.data.model.AddOn
-import com.example.eatzy_buyer.data.model.Canteen
-import com.example.eatzy_buyer.data.model.Menu
+import com.example.eatzy_buyer.common.OrderUpdateNotifier
 import com.example.eatzy_buyer.data.model.Order
 import com.example.eatzy_buyer.data.model.OrderBadge
 import com.example.eatzy_buyer.data.model.OrderItem
@@ -62,195 +62,43 @@ import com.example.eatzy_buyer.data.model.OrderStatus
 import com.example.eatzy_buyer.token
 import com.example.eatzy_buyer.ui.components.BottomNavBar
 import com.example.eatzy_buyer.ui.components.TopBar
-import com.example.eatzy_buyer.ui.screen.myOrder.MyOrderItem
 import com.example.eatzy_buyer.ui.screen.test.HistoryViewModel
-import com.example.eatzy_buyer.ui.screen.test.MyOrderViewModel
 import com.example.eatzy_buyer.ui.theme.EatzyOrange
 import com.example.eatzy_buyer.ui.theme.HeadingGray
 import com.example.eatzy_buyer.ui.theme.HeadingLightGray
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-//private val exampleOrders = listOf(
-//    Order(
-//        id = 1,
-//        buyerId = 1,
-//        canteen = Canteen(
-//            id = 1,
-//            name = "Kantin Pak Muklis"
-//        ),
-//        status = OrderStatus.FINISHED,
-//        orderTime = "2025-05-06 14:23:45",
-//        finishedTime = "2025-05-06 14:23:45",
-//        scheduleTime = "2025-05-06 14:23:45",
-//        estimationTime = 5,
-//        totalPrice = 12000.0,
-//        orderItem = listOf(
-//            OrderItem(
-//                id = 2,
-//                orderId = 1,
-//                details = "Digoreng tidak usah matang",
-//                menu = Menu(
-//                    id = 2,
-//                    name = "Pecel lele",
-//                    preparationTime = 7,
-//                    imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-//                    isAvailable = true,
-//                    addOnCategoryId = emptyList(),
-//                    price = 5000.00
-//                ),
-//                addOns = listOf(
-//                    AddOn(
-//                        id = 1,
-//                        menuId = 2,
-//                        name = "Mendoan",
-//                        price = 12000.00
-//                    ),
-//                    AddOn(
-//                        id = 2,
-//                        menuId = 2,
-//                        name = "Cabe",
-//                        price = 12000.00
-//                    ),
-//                )
-//            ),
-//        )
-//    ),
-//    Order(
-//        id = 1,
-//        buyerId = 1,
-//        canteen = Canteen(
-//            id = 1,
-//            name = "Kantin Pak Muklis"
-//        ),
-//        status = OrderStatus.PROCESSING,
-//        orderTime = "2025-05-06 14:23:45",
-//        finishedTime = "2025-05-06 14:23:45",
-//        scheduleTime = "2025-05-06 14:23:45",
-//        estimationTime = 5,
-//        totalPrice = 12000.0,
-//        orderItem = listOf(
-//            OrderItem(
-//                id = 1,
-//                orderId = 1,
-//                details = "Digoreng sampe matang banget tolong jangan sampai ada yang mentah sedikitpun",
-//                menu = Menu(
-//                    id = 1,
-//                    name = "Ayam mbakar wong soloz Ayam mbakar wong soloz",
-//                    preparationTime = 4,
-//                    imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-//                    isAvailable = true,
-//                    addOnCategoryId = emptyList(),
-//                    price = 5000.00
-//                ),
-//                addOns = listOf(
-//                    AddOn(
-//                        id = 1,
-//                        menuId = 1,
-//                        name = "Mendoan",
-//                        price = 12000.00
-//                    ),
-//                    AddOn(
-//                        id = 2,
-//                        menuId = 1,
-//                        name = "Cabe",
-//                        price = 12000.00
-//                    ),
-//                )
-//            ),
-//            OrderItem(
-//                id = 2,
-//                orderId = 1,
-//                details = "Digoreng tidak usah matang",
-//                menu = Menu(
-//                    id = 2,
-//                    name = "Pecel lele",
-//                    preparationTime = 7,
-//                    imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-//                    isAvailable = true,
-//                    addOnCategoryId = emptyList(),
-//                    price = 5000.00
-//                ),
-//                addOns = listOf(
-//                    AddOn(
-//                        id = 1,
-//                        menuId = 2,
-//                        name = "Mendoan",
-//                        price = 12000.00
-//                    ),
-//                    AddOn(
-//                        id = 2,
-//                        menuId = 2,
-//                        name = "Cabe",
-//                        price = 12000.00
-//                    ),
-//                )
-//            ),
-//        )
-//    ),
-//    Order(
-//        id = 1,
-//        buyerId = 1,
-//        canteen = Canteen(
-//            id = 1,
-//            name = "Kantin Pak Muklis"
-//        ),
-//        status = OrderStatus.FINISHED,
-//        orderTime = "2025-05-06 14:23:45",
-//        finishedTime = "2025-05-06 14:23:45",
-//        scheduleTime = "2025-05-06 14:23:45",
-//        estimationTime = 5,
-//        totalPrice = 12000.0,
-//        orderItem = listOf(
-//            OrderItem(
-//                id = 2,
-//                orderId = 1,
-//                details = "Digoreng tidak usah matang",
-//                menu = Menu(
-//                    id = 2,
-//                    name = "Pecel lele",
-//                    preparationTime = 7,
-//                    imageUrl = "https://foodish-api.com/images/pizza/pizza46.jpg",
-//                    isAvailable = true,
-//                    addOnCategoryId = emptyList(),
-//                    price = 5000.00
-//                ),
-//                addOns = listOf(
-//                    AddOn(
-//                        id = 1,
-//                        menuId = 2,
-//                        name = "Mendoan",
-//                        price = 12000.00
-//                    ),
-//                    AddOn(
-//                        id = 2,
-//                        menuId = 2,
-//                        name = "Cabe",
-//                        price = 12000.00
-//                    ),
-//                )
-//            ),
-//        )
-//    ),
-//
-//    )
-//
-//private val orders = exampleOrders;
 
 
 @Composable
 fun HistoryScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    onNavigateToMyOrder: (Int) -> Unit
+    onNavigateToMyOrder: (Int) -> Unit,
+    onNavigateToCart: (Int) -> Unit
 ) {
 
     val vm: HistoryViewModel = viewModel()
     val orders by vm.orders.collectAsStateWithLifecycle(emptyList())
+    val trigger by OrderUpdateNotifier.trigger.collectAsState()
+    val duplicatedOrderId by vm.duplicatedOrderId.collectAsState()
+
+    LaunchedEffect(trigger) {
+        vm.fetchOrdersByBuyerResponse(token = token)
+    }
 
     LaunchedEffect(Unit) {
         vm.fetchOrdersByBuyerResponse(token = token)
+    }
+
+    LaunchedEffect(duplicatedOrderId) {
+        duplicatedOrderId?.let { newId ->
+            onNavigateToMyOrder(newId)
+            vm.clearDuplicatedOrderId()
+        }
     }
 
     Scaffold(
@@ -266,13 +114,6 @@ fun HistoryScreen(
             Box(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-//                Box(
-//                    modifier = Modifier
-//                        .matchParentSize()
-//
-//                        .clip(RoundedCornerShape(16.dp))
-//                        .background(color = Color(0xFFE5E5E5)),
-//                )
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -280,7 +121,7 @@ fun HistoryScreen(
                         Spacer(modifier = Modifier.height(1.dp))
                     }
                     items(orders) { order ->
-                        OrderHistory(onNavigateToMyOrder = onNavigateToMyOrder, order)
+                        OrderHistory(onNavigateToMyOrder = onNavigateToMyOrder, onNavigateToCart, order, vm)
                     }
                     item {
                         Spacer(modifier = Modifier.height(1.dp))
@@ -294,8 +135,12 @@ fun HistoryScreen(
 @Composable
 fun OrderHistory(
     onNavigateToMyOrder: (Int) -> Unit,
-    order: Order
+    onNavigateToCart: (Int) -> Unit,
+    order: Order,
+    vm: HistoryViewModel
 ) {
+
+    val scope = rememberCoroutineScope()
 
     val orderBadge = when (order.status) {
         OrderStatus.CANCELED -> OrderBadge(
@@ -383,20 +228,16 @@ fun OrderHistory(
         }
 
         Column {
-            // Group items by a composite key (details + menu + addons)
             val groupedItems = order.orderItem.groupBy { item ->
-                // Create a key combining all 3 conditions
                 Triple(
                     item.details,
-                    item.menu.id,  // Assuming Menu has an ID; adjust if needed
-                    item.addOns.sortedBy { it.id }.joinToString(",") { it.id.toString() } // Sort addons for consistency
+                    item.menu.id,
+                    item.addOns.sortedBy { it.id }.joinToString(",") { it.id.toString() }
                 )
-            }.mapValues { it.value.size } // Count occurrences
+            }.mapValues { it.value.size }
 
-            // Display each unique item with its quantity
             groupedItems.forEach { (key, quantity) ->
                 val (details, menuId, addonsKey) = key
-                // Find the first matching item (all in group have same properties)
                 val representativeItem = order.orderItem.first { item ->
                     item.details == details &&
                             item.menu.id == menuId &&
@@ -406,14 +247,6 @@ fun OrderHistory(
             }
         }
 
-//        order.orderItem.forEach { orderItem ->
-//            HistoryItem(orderItem)
-//        }
-//                    Spacer(modifier = Modifier.height(8.dp))
-//        Column(
-//            modifier = Modifier.padding(top = 8.dp),
-//            verticalArrangement = Arrangement.spacedBy(0.dp)
-//        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -441,7 +274,15 @@ fun OrderHistory(
                 }
 
                 ElevatedButton(
-                    onClick = { onNavigateToMyOrder(order.id) },
+                    onClick = {
+                        if (order.status == OrderStatus.PROCESSING || order.status == OrderStatus.WAITING) {
+                            onNavigateToMyOrder(order.id)
+                        } else {
+                            scope.launch {
+                                vm.duplicateOrderByIdResplonse(token, order.id)
+                            }
+                        }
+                              },
                     modifier = Modifier.height(28.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
                     elevation = ButtonDefaults.buttonElevation(
@@ -459,7 +300,6 @@ fun OrderHistory(
                     )
                 }
             }
-//        }
 
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -598,13 +438,13 @@ fun HistoryItem(orderItem: OrderItem, quantity: Int) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun HistoryPreview() {
-//    OrderHistory(onNavigateToMyOrder = {})
-    HistoryScreen(
-        modifier = Modifier,
-        navController = rememberNavController(),
-        onNavigateToMyOrder = {}
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun HistoryPreview() {
+////    OrderHistory(onNavigateToMyOrder = {})
+//    HistoryScreen(
+//        modifier = Modifier,
+//        navController = rememberNavController(),
+//        onNavigateToMyOrder = {}
+//    )
+//}
