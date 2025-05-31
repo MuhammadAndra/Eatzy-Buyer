@@ -80,6 +80,7 @@ fun MyOrderScreen(
     val vm: MyOrderViewModel = viewModel()
     val order by vm.order.collectAsStateWithLifecycle(Order())
     val trigger by OrderUpdateNotifier.trigger.collectAsState()
+    val isLoading by vm.isLoading.collectAsStateWithLifecycle()
 
     LaunchedEffect(trigger) {
         vm.fetchOrdersByIdResponse(token = token, orderId = orderId)
@@ -99,44 +100,54 @@ fun MyOrderScreen(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-//                .fillMaxSize()
-        ) {
-
-            MyOrderHeading(order = order)
-//            Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+        if(isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-                item {
-                    Text(
-                        text = order.canteen.name,
-//                    fontWeight = FontWeight.Medium,
-                        color = HeadingLightGray,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        text = "Rincian Menu",
-                        fontWeight = FontWeight.Bold,
-                        color = HeadingGray,
-                        fontSize = 16.sp
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    OrderCard(order = order)
-                }
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
+                CircularProgressIndicator(color = EatzyOrange)
             }
-        }
+        } else {
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+//                .fillMaxSize()
+                ) {
+
+                    MyOrderHeading(order = order)
+//            Spacer(modifier = Modifier.height(16.dp))
+                    LazyColumn(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        item {
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                        item {
+                            Text(
+                                text = order.canteen.name,
+//                    fontWeight = FontWeight.Medium,
+                                color = HeadingLightGray,
+                                fontSize = 16.sp
+                            )
+                            Text(
+                                text = "Rincian Menu",
+                                fontWeight = FontWeight.Bold,
+                                color = HeadingGray,
+                                fontSize = 16.sp
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            OrderCard(order = order)
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+
+                    }
+                }
+            }
+
     }
 }
 
@@ -156,20 +167,16 @@ fun OrderCard(modifier: Modifier = Modifier, order: Order) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Column {
-            // Group items by a composite key (details + menu + addons)
             val groupedItems = order.orderItem.groupBy { item ->
-                // Create a key combining all 3 conditions
                 Triple(
                     item.details,
-                    item.menu.id,  // Assuming Menu has an ID; adjust if needed
-                    item.addOns.sortedBy { it.id }.joinToString(",") { it.id.toString() } // Sort addons for consistency
+                    item.menu.id,
+                    item.addOns.sortedBy { it.id }.joinToString(",") { it.id.toString() }
                 )
-            }.mapValues { it.value.size } // Count occurrences
+            }.mapValues { it.value.size }
 
-            // Display each unique item with its quantity
             groupedItems.forEach { (key, quantity) ->
                 val (details, menuId, addonsKey) = key
-                // Find the first matching item (all in group have same properties)
                 val representativeItem = order.orderItem.first { item ->
                     item.details == details &&
                             item.menu.id == menuId &&

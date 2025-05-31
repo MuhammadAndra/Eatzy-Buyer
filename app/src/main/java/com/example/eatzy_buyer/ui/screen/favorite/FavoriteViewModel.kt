@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.eatzy_buyer.data.model.Menu
-import com.example.eatzy_buyer.data.model.MenuFavorite
 import com.example.eatzy_buyer.data.model.User
 import com.example.eatzy_buyer.data.network.RetrofitClient
 import com.example.eatzy_buyer.data.network.RetrofitClient.testApi
@@ -27,12 +26,17 @@ class FavoriteViewModel : ViewModel() {
     private val _favorites = MutableStateFlow<List<Menu>>(emptyList())
     val favorites: StateFlow<List<Menu>> = _favorites
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     suspend fun fetchFavoritesResponse(token: String) {
+        _isLoading.value = true
         val response = repository.getFavoritesResponse(token = token)
         if (response.isSuccessful) {
             _favorites.value = response.body() ?: emptyList()
             Log.d("RESPONKU: ",response.body().toString())
         }
+        _isLoading.value = false
     }
 
     suspend fun deleteFavorite(token: String, menuId: Int) {

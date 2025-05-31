@@ -85,6 +85,7 @@ fun HistoryScreen(
     val orders by vm.orders.collectAsStateWithLifecycle(emptyList())
     val trigger by OrderUpdateNotifier.trigger.collectAsState()
     val duplicatedOrderId by vm.duplicatedOrderId.collectAsState()
+    val isLoading by vm.isLoading.collectAsStateWithLifecycle()
 
     LaunchedEffect(trigger) {
         vm.fetchOrdersByBuyerResponse(token = token)
@@ -96,7 +97,7 @@ fun HistoryScreen(
 
     LaunchedEffect(duplicatedOrderId) {
         duplicatedOrderId?.let { newId ->
-            onNavigateToMyOrder(newId)
+            onNavigateToCart(newId)
             vm.clearDuplicatedOrderId()
         }
     }
@@ -108,23 +109,32 @@ fun HistoryScreen(
             title = "History"
         ) }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier.padding(innerPadding)
-        ) {
+        if(isLoading) {
             Box(
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                CircularProgressIndicator(color = EatzyOrange)
+            }
+        } else  {
+            Column(
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                Box(
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 ) {
-                    item {
-                        Spacer(modifier = Modifier.height(1.dp))
-                    }
-                    items(orders) { order ->
-                        OrderHistory(onNavigateToMyOrder = onNavigateToMyOrder, onNavigateToCart, order, vm)
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(1.dp))
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        item {
+                            Spacer(modifier = Modifier.height(1.dp))
+                        }
+                        items(orders) { order ->
+                            OrderHistory(onNavigateToMyOrder = onNavigateToMyOrder, order, vm)
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(1.dp))
+                        }
                     }
                 }
             }
@@ -135,7 +145,6 @@ fun HistoryScreen(
 @Composable
 fun OrderHistory(
     onNavigateToMyOrder: (Int) -> Unit,
-    onNavigateToCart: (Int) -> Unit,
     order: Order,
     vm: HistoryViewModel
 ) {

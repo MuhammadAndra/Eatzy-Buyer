@@ -67,7 +67,6 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.example.eatzy_buyer.data.model.Canteen
 import com.example.eatzy_buyer.data.model.Menu
 import com.example.eatzy_buyer.data.model.MenuCategory
-import com.example.eatzy_buyer.data.model.MenuFavorite
 import com.example.eatzy_buyer.token
 import com.example.eatzy_buyer.ui.components.BottomNavBar
 import com.example.eatzy_buyer.ui.components.TopBarSearch
@@ -97,12 +96,11 @@ fun FavoriteScreen(
 
     val vm: FavoriteViewModel = viewModel()
     val favorites by vm.favorites.collectAsStateWithLifecycle(emptyList())
+    val isLoading by vm.isLoading.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         vm.fetchFavoritesResponse(token = token)
     }
-
-
 
     Scaffold(
         bottomBar = { BottomNavBar(navController) },
@@ -119,37 +117,43 @@ fun FavoriteScreen(
             )
         }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-//            items(favorites) { favorite ->
-//                Text(text = "${favorite.name} - ${favorite.price}")
-//            }
-            item {
-                Spacer(modifier = Modifier.height(1.dp))
+        if(isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = EatzyOrange)
             }
-            items(favorites.filter {
-                it.name.contains(searchQuery, ignoreCase = true) ||
-                        it.category?.canteen?.name?.contains(
-                            searchQuery,
-                            ignoreCase = true
-                        ) == true
-            }
-            ) { favorite ->
-                FavoriteItemCard(
-                    Modifier,
-                    favorite,
-                    onNavigateToOrder,
-                    vm = vm,
-                    coroutineScope = coroutineScope,
-                    token = token
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(1.dp))
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(1.dp))
+                }
+                items(favorites.filter {
+                    it.name.contains(searchQuery, ignoreCase = true) ||
+                            it.category?.canteen?.name?.contains(
+                                searchQuery,
+                                ignoreCase = true
+                            ) == true
+                }
+                ) { favorite ->
+                    FavoriteItemCard(
+                        Modifier,
+                        favorite,
+                        onNavigateToOrder,
+                        vm = vm,
+                        coroutineScope = coroutineScope,
+                        token = token
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(1.dp))
+                }
             }
         }
     }

@@ -3,7 +3,6 @@ package com.example.eatzy_buyer.data.repository
 import android.net.http.HttpException
 import android.util.Log
 import com.example.eatzy_buyer.data.model.Menu
-import com.example.eatzy_buyer.data.model.MenuFavorite
 import com.example.eatzy_buyer.data.model.User
 import com.example.eatzy_buyer.data.network.RetrofitClient
 import com.example.eatzy_buyer.data.network.api.TestApiService

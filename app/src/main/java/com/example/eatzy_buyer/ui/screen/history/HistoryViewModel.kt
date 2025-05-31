@@ -11,16 +11,21 @@ class HistoryViewModel : ViewModel() {
 
     private val repository = OrderRepository()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     private val _orders = MutableStateFlow<List<Order>>(emptyList())
 
     val orders: StateFlow<List<Order>> = _orders
 
     suspend fun fetchOrdersByBuyerResponse(token: String) {
+        _isLoading.value = true
         val response = repository.getOrdersByBuyerResponse(token = token)
         if (response.isSuccessful) {
             _orders.value = response.body() ?: emptyList()
             Log.d("RESPONKU: ",response.body().toString())
         }
+        _isLoading.value = false
     }
 
     private val _duplicatedOrderId = MutableStateFlow<Int?>(null)
