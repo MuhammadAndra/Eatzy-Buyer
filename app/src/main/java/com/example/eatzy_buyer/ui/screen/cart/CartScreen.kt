@@ -82,9 +82,11 @@ fun CartScreen(
                     .padding(horizontal = 16.dp)
             ) {
                 items(cart) { cart ->
-                    CartCard(cart = cart) { order_id ->
-                        navController.navigate("confirmation/$order_id")
+                    if(cart.items.isNotEmpty()){
+                        CartCard(cart = cart) { order_id ->
+                            navController.navigate("confirmation/$order_id")
                         }
+                    }
 
                     Spacer(modifier = Modifier.height(12.dp))
                 }

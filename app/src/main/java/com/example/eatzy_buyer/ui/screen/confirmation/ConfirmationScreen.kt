@@ -56,9 +56,13 @@ fun ConfirmationScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
     var isNowSelected by remember { mutableStateOf(true) }
 
-    val selectedItem = confirmation?.items?.firstOrNull()
-    val unitPrice = selectedItem?.menu_price ?: 0.0
-    val totalPrice = unitPrice * quantity
+//    val selectedItem = confirmation?.items?.firstOrNull()
+
+    val selectedItem = confirmation?.items
+//    val unitPrice = selectedItem?.menu_price ?: 0.0
+//    val totalPrice = unitPrice * quantity
+    val totalPrice = confirmation?.total_price
+
 
     val orangeColor = Color(0xFFF4A623)
     val unselectedTextColor = Color(0xFF455E84)
@@ -177,7 +181,18 @@ fun ConfirmationScreen(
             Text("Rincian Menu", fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(8.dp))
 
-            selectedItem?.let { item ->
+//            selectedItem?.let { item ->
+//                MenuDetailCard(
+//                    imageUrl = item.menu_image,
+//                    title = item.menu_name,
+//                    subtitle = item.addons.joinToString(", "),
+//                    price = item.menu_price,
+//                    quantity = quantity,
+//                    note = item.note ?: ""
+//                )
+//            }
+
+            selectedItem?.forEach {item->
                 MenuDetailCard(
                     imageUrl = item.menu_image,
                     title = item.menu_name,
@@ -209,7 +224,7 @@ fun ConfirmationScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("Total Harga", fontWeight = FontWeight.Medium)
-                Text(formatRupiah(totalPrice), fontWeight = FontWeight.Bold)
+                Text(text = "${totalPrice?.let { formatRupiah(it) }}", fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
