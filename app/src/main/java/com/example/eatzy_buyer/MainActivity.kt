@@ -9,7 +9,7 @@ import com.example.eatzy_buyer.navigation.AppNavigation
 import com.example.eatzy_buyer.ui.theme.EatzyBuyerTheme
 
 //tokennya taro sini, kalo apinya butuh authorisasi
-const val token ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhbmRyYWxtYUBleGFtcGxlLmNvbSIsInJvbGUiOiJjYW50ZWVuIiwiaWF0IjoxNzQ3MTkxOTA2LCJleHAiOjE3NDcxOTU1MDZ9.uPqT6DXBYM6JQEhLQ12Pbaf9SxxKxxPNYpu6KKypZMA"
+const val token ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjEsImVtYWlsIjoiY2F0dGxleWExNzI0QGdtYWlsLmNvbSIsInJvbGUiOiJidXllciIsImlhdCI6MTc0ODY4NzU4NSwiZXhwIjoxNzY0MjM5NTg1fQ.5Z6ZIUU8V2yjfyRx-C83EKY3Ru7hxvUguQnW3eHFC2w"
 class MainActivity : ComponentActivity() {
     private val userViewModel: UserViewModel by viewModels { UserViewModelFactory(this) }
 

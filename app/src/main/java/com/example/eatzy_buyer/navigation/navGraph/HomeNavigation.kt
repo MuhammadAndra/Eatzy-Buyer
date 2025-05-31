@@ -7,16 +7,11 @@ import com.example.eatzy_buyer.ui.screen.canteen.CanteenScreen
 
 import kotlinx.serialization.Serializable
 
-@Serializable
-object Search
 
 @Serializable
 object Canteen
 
 fun NavGraphBuilder.homeGraph(navController: NavController) {
-    composable<Search> {
-
-    }
     composable<Canteen> {
         CanteenScreen(onNavigateToLogin = { navController.navigate(Login) })
     }

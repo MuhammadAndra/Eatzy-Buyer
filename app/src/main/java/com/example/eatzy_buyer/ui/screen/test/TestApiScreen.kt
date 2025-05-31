@@ -31,7 +31,7 @@ fun TestApiScreen(
         Column(modifier = Modifier.padding(innerpadding)) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 items(users){user ->
-                    Text("${user.username} - ${user.email}")
+                    Text("${user.name} - ${user.email}")
                 }
             }
         }
