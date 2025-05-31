@@ -34,7 +34,6 @@ object RetrofitClient {
             .build()
     }
 
-
     val testApi: TestApiService by lazy { retrofit.create(TestApiService::class.java) }
 
 }
