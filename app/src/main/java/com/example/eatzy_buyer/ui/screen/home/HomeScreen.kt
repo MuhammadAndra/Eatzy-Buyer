@@ -53,7 +53,6 @@ fun HomeScreen(
     val canteens by vm.canteens.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-//        vm.fetchUsers()
         vm.fetchCanteens(token = token)
     }
 

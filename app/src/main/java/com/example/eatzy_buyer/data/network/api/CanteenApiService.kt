@@ -13,6 +13,11 @@ interface CanteenApiService {
         @Header("authorization") token: String
     ): Response<List<Canteen>>
 
+    @GET("/canteens/{id}")
+    suspend fun getCanteenById(
+        @Path("id") id:Int
+    ): Response<Canteen>
+
     @GET("canteens/{id}/menu-category")
     suspend fun getAllMenuCategoryByCanteen(
         @Path("id") id:Int

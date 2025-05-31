@@ -4,15 +4,15 @@ import com.google.gson.annotations.SerializedName
 
 data class Canteen(
     @SerializedName("canteen_id")
-    val id: Int,
+    val id: Int = 1,
     @SerializedName("canteen_name")
-    val name: String,
+    val name: String = "",
     @SerializedName("canteen_image")
-    val imageUrl: String,
+    val imageUrl: String = "",
     @SerializedName("canteen_is_open")
-    val isOpen:Boolean,
-    val menuCategoryId: List<Int>? = null,
-    )
+    val isOpen: Boolean = true,
+    val menuCategoryId: List<Int>? = null
+)
 //data class Canteen(
 //    @SerializedName("canteen_id")
 //    val id: Int,

@@ -1,5 +1,6 @@
 package com.example.eatzy_buyer.ui.screen.addMenu
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,9 +38,11 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +58,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -63,11 +68,11 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.example.eatzy_buyer.data.model.AddOn
 import com.example.eatzy_buyer.data.model.AddOnCategory
 import com.example.eatzy_buyer.data.model.Menu
-import com.example.eatzy_buyer.data.model.getAddOnCategories
+import com.example.eatzy_buyer.data.model.Order
+import com.example.eatzy_buyer.data.model.OrderItem
 
-import com.example.eatzy_buyer.data.model.getMenuById
+import com.example.eatzy_buyer.token
 import com.example.eatzy_buyer.ui.components.TopBar
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -75,221 +80,316 @@ import java.util.Locale
 @Composable
 fun AddMenuScreen(
     modifier: Modifier = Modifier,
-    idCategoryMenu: Int,
-    idMenu: Int,
+    idCategoryMenu: Int? = 1,
+    menuId: Int,
+    canteenId: Int,
+    orderId: Int? = null,
+    orderItemId: Int? = null,
+    count: Int? = null,
+    orderItemIds: List<Int>? = emptyList(),
     navController: NavController,
     onNavigateUp: () -> Unit,
 ) {
-    val menu = getMenuById(idCategoryMenu = idCategoryMenu, idMenu = idMenu)
-    val addOnCategories = getAddOnCategories(menu = menu)
-    var quantity by remember { mutableIntStateOf(1) }
-    val checkedAddOns =
-        remember { mutableStateMapOf<Int, Boolean>() } // Multiple
-    val selectedAddOnPerCategory =
-        remember { mutableStateMapOf<Int, Int>() } // Single (Map<CategoryId, SelectedAddOnId>)
+    Log.d("orderItemId", orderItemId.toString())
+    Log.d("orderItemIds", orderItemIds.toString())
+    Log.d("count", count.toString())
+    val vm: AddMenuViewModel = viewModel()
+    val menu by vm.menu.collectAsStateWithLifecycle()
+    val orderItems by vm.orderItems.collectAsStateWithLifecycle()
 
-    //bawah ini untuk ambil addon yang di select
-    val selectedAddOns = checkedAddOns.filterValues { it }.keys
-    var notes by remember { mutableStateOf("") }
-
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    var totalAddOnPrice by remember { mutableDoubleStateOf(0.0) }
-
-    fun calculateTotalAddOnPrice(
-        allAddOns: List<AddOn>,
-        checkedAddOns: Map<Int, Boolean>,
-        selectedAddOnPerCategory: Map<Int, Int>
-    ): Double {
-        val checkedPrice = allAddOns
-            .filter { checkedAddOns[it.id] == true }
-            .sumOf { it.price }
-
-        val selectedPrice = allAddOns
-            .filter { addOn -> selectedAddOnPerCategory.values.contains(addOn.id) }
-            .sumOf { it.price }
-
-        return checkedPrice + selectedPrice
-    }
-
-    fun getSelectedAddOns(
-        allAddOns: List<AddOn>,
-        checkedAddOns: Map<Int, Boolean>,
-        selectedAddOnPerCategory: Map<Int, Int>
-    ): List<AddOn> {
-        return allAddOns.filter { addOn ->
-            checkedAddOns[addOn.id] == true || selectedAddOnPerCategory.values.contains(
-                addOn.id
-            )
+    LaunchedEffect(Unit) {
+        vm.getMenuById(menuId)
+        if (!orderItemIds.isNullOrEmpty()) {
+            vm.getOrderItemsByIds(token = token, ids = orderItemIds)
         }
     }
+    Log.d("TEST ORDERITEMS",orderItems.toString())
 
-    Scaffold(
-        topBar = {
-            TopBar(
-                title = "Tambahkan",
-                onNavigateUp = onNavigateUp
-            )
-        },
+    if (menu == null) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else {
+        val addOnCategories = menu!!.addOnCategories
+
+        var quantity by remember { mutableIntStateOf(1) }
+        if (count != null) quantity = count
+
+        // Multiple
+        val checkedAddOns = remember { mutableStateMapOf<Int, Boolean>() }
+        // Single (Map<CategoryId, SelectedAddOnId>)
+        val selectedAddOnPerCategory =
+            remember { mutableStateMapOf<Int, Int>() }
+
+        //bawah ini untuk ambil addon yang di select
+        val selectedAddOns = checkedAddOns.filterValues { it }.keys
+        var notes by remember { mutableStateOf("") }
+
+
+        val keyboardController = LocalSoftwareKeyboardController.current
+
+        var totalAddOnPrice by remember { mutableDoubleStateOf(0.0) }
+
+        fun calculateTotalAddOnPrice(
+            allAddOns: List<AddOn>,
+            checkedAddOns: Map<Int, Boolean>,
+            selectedAddOnPerCategory: Map<Int, Int>
+        ): Double {
+            val checkedPrice = allAddOns
+                .filter { checkedAddOns[it.id] == true }
+                .sumOf { it.price }
+
+            val selectedPrice = allAddOns
+                .filter { addOn ->
+                    selectedAddOnPerCategory.values.contains(
+                        addOn.id
+                    )
+                }
+                .sumOf { it.price }
+
+            return checkedPrice + selectedPrice
+        }
+
+        //        allAddOns = addOnCategories.flatMap { it.addOns },
+        //                                checkedAddOns = checkedAddOns,
+//                                selectedAddOnPerCategory = selectedAddOnPerCategory
+        fun getSelectedAddOns(
+            allAddOns: List<AddOn>,
+            checkedAddOns: Map<Int, Boolean>,
+            selectedAddOnPerCategory: Map<Int, Int>
+        ): List<AddOn> {
+            return allAddOns.filter { addOn ->
+                checkedAddOns[addOn.id] == true || selectedAddOnPerCategory.values.contains(
+                    addOn.id
+                )
+            }
+        }
+
+        Scaffold(
+            topBar = {
+                TopBar(
+                    title = if(count==null) "Tambahkan" else "Edit Pesanan",
+                    onNavigateUp = onNavigateUp
+                )
+            },
 //        bottomBar = { BottomNavBar(navController = navController) }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize(), // supaya tidak ketabrak tombol
-                contentPadding = innerPadding,
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
-                item {
-                    GlideImage(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(350.dp),
-                        model = menu.imageUrl,
-                        contentDescription = "Image ${menu.name}",
-                        contentScale = ContentScale.Crop,
-                        loading = placeholder {
-                            Box(
-                                modifier = Modifier
-                                    .background(Color.Transparent)
-                                    .fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize(), // supaya tidak ketabrak tombol
+                    contentPadding = innerPadding,
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    item {
+                        GlideImage(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(350.dp),
+                            model = menu!!.imageUrl,
+                            contentDescription = "Image ${menu!!.name}",
+                            contentScale = ContentScale.Crop,
+                            loading = placeholder {
+                                Box(
+                                    modifier = Modifier
+                                        .background(Color.Transparent)
+                                        .fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        color = Color(
+                                            0XFFFC9824
+                                        )
+                                    )
+                                }
+                            }
+                        )
+                    }
+                    item {
+                        MenuHeader(
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                            ),
+                            menu = menu!!,
+                            quantity = quantity,
+                            onIncrement = { quantity++ },
+                            onDecrement = { if (quantity > 0) quantity-- }
+                        )
+                    }
+                    addOnCategories.forEach { addOnCategory ->
+                        item {
+                            AddMenuCustomCard(
+                                modifier = Modifier.padding(
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                ),
+                                name = addOnCategory.name
                             ) {
-                                CircularProgressIndicator(color = Color(0XFFFC9824))
+                                Column {
+                                    if (addOnCategory.isMultipleChoice) {
+                                        addOnCategory.addOns.forEach { addOn ->
+                                            val isChecked =
+                                                checkedAddOns[addOn.id] ?: false
+                                            AddOnCardCheckbox(
+                                                addOn = addOn,
+                                                checked = isChecked,
+                                                onCheckedChange = { checked ->
+                                                    checkedAddOns[addOn.id] =
+                                                        checked
+                                                    totalAddOnPrice =
+                                                        calculateTotalAddOnPrice(
+                                                            allAddOns = addOnCategories.flatMap { it.addOns },
+                                                            checkedAddOns = checkedAddOns,
+                                                            selectedAddOnPerCategory = selectedAddOnPerCategory
+                                                        )
+                                                }
+                                            )
+                                        }
+                                    } else {
+                                        val selectedId =
+                                            selectedAddOnPerCategory[addOnCategory.id]
+                                        addOnCategory.addOns.forEach { addOn ->
+                                            AddOnCardRadioButton(
+                                                addOn = addOn,
+                                                selected = selectedId == addOn.id,
+                                                onSelect = {
+                                                    selectedAddOnPerCategory[addOnCategory.id] =
+                                                        addOn.id
+                                                    totalAddOnPrice =
+                                                        calculateTotalAddOnPrice(
+                                                            allAddOns = addOnCategories.flatMap { it.addOns },
+                                                            checkedAddOns = checkedAddOns,
+                                                            selectedAddOnPerCategory = selectedAddOnPerCategory
+                                                        )
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
-                    )
-                }
-                item {
-                    MenuHeader(
-                        modifier = Modifier.padding(
-                            start = 16.dp,
-                            end = 16.dp,
-                        ),
-                        menu = menu,
-                        quantity = quantity,
-                        onIncrement = { quantity++ },
-                        onDecrement = { if (quantity > 1) quantity-- }
-                    )
-                }
-                addOnCategories.forEach { addOnCategory ->
+                    }
                     item {
                         AddMenuCustomCard(
                             modifier = Modifier.padding(
                                 start = 16.dp,
                                 end = 16.dp,
+                                bottom = 70.dp
                             ),
-                            name = addOnCategory.name
+                            name = "Catatan Untuk Kantin"
                         ) {
-                            Column {
-                                if (addOnCategory.isMultipleChoice) {
-                                    addOnCategory.addOns.forEach { addOn ->
-                                        val isChecked =
-                                            checkedAddOns[addOn.id] ?: false
-                                        AddOnCardCheckbox(
-                                            addOn = addOn,
-                                            checked = isChecked,
-                                            onCheckedChange = { checked ->
-                                                checkedAddOns[addOn.id] =
-                                                    checked
-                                                totalAddOnPrice =
-                                                    calculateTotalAddOnPrice(
-                                                        allAddOns = addOnCategories.flatMap { it.addOns },
-                                                        checkedAddOns = checkedAddOns,
-                                                        selectedAddOnPerCategory = selectedAddOnPerCategory
-                                                    )
-                                            }
-                                        )
+                            OutlinedTextField(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                shape = RoundedCornerShape(10.dp),
+                                value = notes,
+                                onValueChange = { input ->
+                                    // Hapus karakter newline yang dimasukkan pengguna lewat Enter
+                                    notes = input.replace("\n", "")
+                                },
+                                maxLines = 5,
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboardController?.hide()
                                     }
-                                } else {
-                                    val selectedId =
-                                        selectedAddOnPerCategory[addOnCategory.id]
-                                    addOnCategory.addOns.forEach { addOn ->
-                                        AddOnCardRadioButton(
-                                            addOn = addOn,
-                                            selected = selectedId == addOn.id,
-                                            onSelect = {
-                                                selectedAddOnPerCategory[addOnCategory.id] =
-                                                    addOn.id
-                                                totalAddOnPrice =
-                                                    calculateTotalAddOnPrice(
-                                                        allAddOns = addOnCategories.flatMap { it.addOns },
-                                                        checkedAddOns = checkedAddOns,
-                                                        selectedAddOnPerCategory = selectedAddOnPerCategory
-                                                    )
-                                            }
-                                        )
-                                    }
-                                }
-                            }
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(0xFF455E84),
+                                )
+                            )
                         }
                     }
-                }
-                item {
-                    AddMenuCustomCard(
-                        modifier = Modifier.padding(
-                            start = 16.dp,
-                            end = 16.dp,
-                            bottom = 70.dp
-                        ),
-                        name = "Catatan Untuk Kantin"
-                    ) {
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            shape = RoundedCornerShape(10.dp),
-                            value = notes,
-                            onValueChange = { input ->
-                                // Hapus karakter newline yang dimasukkan pengguna lewat Enter
-                                notes = input.replace("\n", "")
-                            },
-                            maxLines = 5,
-                            keyboardOptions = KeyboardOptions.Default.copy(
-                                imeAction = ImeAction.Done
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboardController?.hide()
-                                }
-                            ),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF455E84),
-                            )
-                        )
+                    item {
+
                     }
                 }
-                item {
 
-                }
-            }
-
-            // Tombol mengambang
-            ElevatedCard(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .background(Color(0XFFFFFFFF))
-                    .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
-                    .border(
-                        1.dp,
-                        Color(0xffFC9824),
-                        shape = RoundedCornerShape(
-                            topStart = 10.dp,
-                            topEnd = 10.dp
+                // Tombol mengambang
+                ElevatedCard(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .background(Color(0XFFFFFFFF))
+                        .clip(
+                            RoundedCornerShape(
+                                topStart = 10.dp,
+                                topEnd = 10.dp
+                            )
                         )
-                    ) // Outline-nya di sini
-                    .align(Alignment.BottomCenter),
-                elevation = CardDefaults.elevatedCardElevation(4.dp),
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = Color.White
-                )
-            ) {
-                AddMenuCustomButton(
-                    onClick = {},
-                    fullPrice = (menu.price * quantity + menu.price * quantity + totalAddOnPrice)
-                )
+                        .border(
+                            1.dp,
+                            Color(0xffFC9824),
+                            shape = RoundedCornerShape(
+                                topStart = 10.dp,
+                                topEnd = 10.dp
+                            )
+                        ) // Outline-nya di sini
+                        .align(Alignment.BottomCenter),
+                    elevation = CardDefaults.elevatedCardElevation(4.dp),
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = Color.White
+                    )
+                ) {
+                    val textTotalHarga =
+                        "${if (count == null) "Tambah ke Keranjang" else "Perbarui Keranjang"} ${
+                            NumberFormat
+                                .getCurrencyInstance(Locale("in", "ID"))
+                                .format(((menu!!.price + totalAddOnPrice) * quantity))
+                        }"
+
+                    AddMenuCustomButton(
+                        text = if (quantity != 0) textTotalHarga else "Balik ke Menu",
+                        onClick = {
+                            if (quantity != 0) {
+                                if (orderId == null) {
+                                    vm.createOrder(
+                                        token = token,
+                                        order = Order(
+                                            canteenId = canteenId,
+                                            totalPrice = (menu!!.price + totalAddOnPrice) * quantity,
+                                            orderItem = List(quantity) {
+                                                OrderItem(
+                                                    menuId = menu!!.id,
+                                                    details = notes.ifBlank { null },
+                                                    addOns = getSelectedAddOns(
+                                                        allAddOns = addOnCategories.flatMap { it.addOns },
+                                                        checkedAddOns = checkedAddOns,
+                                                        selectedAddOnPerCategory = selectedAddOnPerCategory
+                                                    )
+                                                )
+                                            }
+                                        )
+                                    )
+                                } else {
+                                    vm.createOrderItems(
+                                        token = token,
+                                        orderItems = List(quantity){
+                                            OrderItem(
+                                                orderId = orderId,
+                                                menuId = menu!!.id,
+                                                details = notes.ifBlank { null },
+                                                addOns = getSelectedAddOns(
+                                                    allAddOns = addOnCategories.flatMap { it.addOns },
+                                                    checkedAddOns = checkedAddOns,
+                                                    selectedAddOnPerCategory = selectedAddOnPerCategory
+                                                )
+                                            )
+                                        }
+                                    )
+                                }
+                                onNavigateUp()
+                            } else {
+                                onNavigateUp()
+                            }
+                        },
+                    )
+                }
             }
         }
     }
@@ -301,9 +401,10 @@ fun AddMenuScreen(
 private fun AddMenuScreenPreview() {
     AddMenuScreen(
         idCategoryMenu = 0,
-        idMenu = 0,
+        menuId = 0,
         navController = rememberNavController(),
-        onNavigateUp = {}
+        onNavigateUp = {},
+        canteenId = 1,
     )
 }
 
@@ -570,13 +671,13 @@ private fun AddOnCardRadioButtonPreview() {
 @Composable
 fun AddMenuCustomButton(
     modifier: Modifier = Modifier,
-    fullPrice: Double,
+    text: String,
     onClick: () -> Unit
 ) {
     ElevatedButton(
         onClick = onClick,
         modifier = Modifier
-            .padding(vertical = 10.dp, horizontal = 18.dp)
+            .padding(vertical = 10.dp, horizontal = 16.dp)
             .fillMaxWidth(),
         colors = ButtonDefaults.elevatedButtonColors(
             Color(
@@ -585,11 +686,7 @@ fun AddMenuCustomButton(
         )
     ) {
         Text(
-            text = "Tambah ke Keranjang ${
-                NumberFormat
-                    .getCurrencyInstance(Locale("in", "ID"))
-                    .format(fullPrice)
-            }",
+            text = text,
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White

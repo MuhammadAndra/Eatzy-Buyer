@@ -6,7 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.eatzy_buyer.navigation.AppNavigation
 import com.example.eatzy_buyer.ui.theme.EatzyBuyerTheme
-const val token ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhbXlAZXhhbXBsZS5jb20iLCJyb2xlIjoiYnV5ZXIiLCJpYXQiOjE3NDc1NTE1ODksImV4cCI6MTc2MzEwMzU4OX0.Jz0XAzuQTFdmC35xx6dBzTlfLxgrbVtZhjEdCysiteo"
+
+const val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhbXlAZXhhbXBsZS5jb20iLCJyb2xlIjoiYnV5ZXIiLCJpYXQiOjE3NDc3MjI0NDgsImV4cCI6MTc2MzI3NDQ0OH0.DbNdHUTKxZqoXML7IIHgN9g1pkNj7pxSaZqquZ50Oro"
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
