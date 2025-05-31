@@ -1,6 +1,7 @@
 package com.example.eatzy_buyer.navigation
 
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -11,16 +12,22 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.eatzy_buyer.ui.screen.cart.CartScreen
+import com.example.eatzy_buyer.ui.screen.confirmation.ConfirmationScreen
 import com.example.eatzy_buyer.navigation.navGraph.Home
 import com.example.eatzy_buyer.navigation.navGraph.Test
 import com.example.eatzy_buyer.navigation.navGraph.authGraph
+import com.example.eatzy_buyer.navigation.navGraph.cartGraph
+import com.example.eatzy_buyer.navigation.navGraph.confirmationGraph
 import com.example.eatzy_buyer.navigation.navGraph.homeGraph
 import com.example.eatzy_buyer.navigation.navGraph.mainGraph
 import com.example.eatzy_buyer.navigation.navGraph.menuGraph
+import com.example.eatzy_buyer.navigation.navGraph.successGraph
 import com.example.eatzy_buyer.navigation.navGraph.testGraph
 import com.example.eatzy_buyer.UserViewModel
 import com.example.eatzy_buyer.UserViewModelFactory
 import com.example.eatzy_buyer.navigation.navGraph.*
+import com.example.eatzy_buyer.ui.screen.successful.SuccessfulScreen
 
 
 @Composable
@@ -48,5 +55,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         homeGraph(navController )
         testGraph(navController)
         menuGraph(navController)
+        cartGraph(navController)
+        confirmationGraph(navController)
+        successGraph(navController)
+
     }
 }

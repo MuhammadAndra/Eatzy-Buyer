@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     kotlin("plugin.serialization") version "2.0.21"
     id("com.google.devtools.ksp") version "2.0.21-1.0.25"
+    kotlin("kapt")
 }
 
 android {
@@ -30,6 +31,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -56,11 +58,6 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.8.9")
     // JSON serialization library, works with the Kotlin serialization plugin
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-
-//    implementation("com.squareup.okhttp3:okhttp:3.4.1")
-//    implementation("com.squareup.okhttp3:logging-interceptor:3.4.1")
-//    implementation("com.squareup.retrofit2:converter-gson:2.1.0")
-//    implementation("com.squareup.retrofit2:retrofit:2.1.0")
 
     // Retrofit (versi modern dengan dukungan coroutine)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -90,6 +87,15 @@ dependencies {
     implementation ("com.github.bumptech.glide:compose:1.0.0-beta01")
     implementation("io.coil-kt.coil3:coil-compose:3.2.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
+
+    implementation("androidx.compose.material3:material3:1.3.2")
+    implementation("io.github.vanpra.compose-material-dialogs:core:0.9.0")
+    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.github.bumptech.glide:compiler:4.15.1")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

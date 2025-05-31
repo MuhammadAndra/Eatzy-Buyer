@@ -48,7 +48,9 @@ fun NavGraphBuilder.mainGraph(navController: NavController, viewModel: UserViewM
             HistoryScreen(navController = navController)
         }
         composable<Cart> {
-            CartScreen(navController = navController)
+            CartScreen(navController = navController, onCheckoutClick = { order_id ->
+                navController.navigate("confirmation/$order_id")
+            })
         }
         composable<Favorite> {
             FavoriteScreen(navController = navController)

@@ -5,6 +5,8 @@ import com.example.eatzy_buyer.data.network.api.MenuApiService
 import com.example.eatzy_buyer.data.network.api.OrderApiService
 import com.example.eatzy_buyer.data.network.api.TestApiService
 import okhttp3.Interceptor
+import com.example.eatzy_buyer.data.network.api.ConfirmApiService
+import com.example.eatzy_buyer.data.network.api.CartApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -41,4 +43,11 @@ object RetrofitClient {
     val canteenApi: CanteenApiService by lazy { retrofit.create(CanteenApiService::class.java) }
     val menuApi: MenuApiService by lazy { retrofit.create(MenuApiService::class.java) }
     val orderApi: OrderApiService by lazy { retrofit.create(OrderApiService::class.java) }
+    val confirmApi: ConfirmApiService by lazy {
+        retrofit.create(ConfirmApiService::class.java)
+    }
+
+    val cartApi: CartApiService by lazy {
+        retrofit.create(CartApiService::class.java)
+    }
 }

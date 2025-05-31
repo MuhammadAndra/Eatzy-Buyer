@@ -1,5 +1,6 @@
 package com.example.eatzy_buyer.data.network.api
 
+import com.example.eatzy_buyer.data.model.Cart
 import com.example.eatzy_buyer.data.model.User
 import retrofit2.Call
 import retrofit2.Response
