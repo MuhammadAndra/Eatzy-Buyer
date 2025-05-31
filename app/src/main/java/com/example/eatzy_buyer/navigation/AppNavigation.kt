@@ -15,7 +15,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.eatzy_buyer.ui.screen.cart.CartScreen
 import com.example.eatzy_buyer.ui.screen.confirmation.ConfirmationScreen
+import com.example.eatzy_buyer.navigation.navGraph.Favorite
+import com.example.eatzy_buyer.navigation.navGraph.History
 import com.example.eatzy_buyer.navigation.navGraph.Home
+import com.example.eatzy_buyer.navigation.navGraph.MyOrder
 import com.example.eatzy_buyer.navigation.navGraph.Test
 import com.example.eatzy_buyer.navigation.navGraph.authGraph
 import com.example.eatzy_buyer.navigation.navGraph.cartGraph
@@ -24,6 +27,7 @@ import com.example.eatzy_buyer.navigation.navGraph.homeGraph
 import com.example.eatzy_buyer.navigation.navGraph.mainGraph
 import com.example.eatzy_buyer.navigation.navGraph.menuGraph
 import com.example.eatzy_buyer.navigation.navGraph.successGraph
+import com.example.eatzy_buyer.navigation.navGraph.orderGraph
 import com.example.eatzy_buyer.navigation.navGraph.testGraph
 import com.example.eatzy_buyer.UserViewModel
 import com.example.eatzy_buyer.UserViewModelFactory
@@ -59,6 +63,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         cartGraph(navController)
         confirmationGraph(navController)
         successGraph(navController)
+        orderGraph(navController)
 
     }
 }

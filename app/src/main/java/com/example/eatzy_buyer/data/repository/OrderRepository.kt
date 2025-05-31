@@ -3,6 +3,7 @@ package com.example.eatzy_buyer.data.repository
 import com.example.eatzy_buyer.data.model.Order
 import com.example.eatzy_buyer.data.model.OrderItem
 import com.example.eatzy_buyer.data.network.RetrofitClient
+import retrofit2.Response
 
 class OrderRepository {
     suspend fun createOrder(token: String, order: Order): Unit? {
@@ -98,6 +99,19 @@ class OrderRepository {
             emptyList() // bisa juga lempar exception
         }
     }
+
+    suspend fun getOrdersByBuyerResponse(token: String): Response<List<Order>> {
+        return RetrofitClient.orderApi.getOrdersByBuyerResponse(token = "Bearer $token")
+    }
+
+    suspend fun getOrdersByIdResponse(token: String, orderId: Int): Response<Order> {
+        return RetrofitClient.orderApi.getOrdersByIdResponse(token = "Bearer $token", orderId = orderId)
+    }
+
+    suspend fun duplicateOrderByIdResponse(token: String, orderId: Int): Response<Int> {
+        return RetrofitClient.orderApi.duplicateOrderByIdResponse(token = "Bearer $token", orderId = orderId)
+    }
+
 
     suspend fun deleteOrderItemByIds(token: String, orderItemIds:List<Int>):Unit?{
         return try {

@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 fun TopBar(
     modifier: Modifier = Modifier,
     title: String,
-    onNavigateUp: () -> Unit,
+    onNavigateUp: (() -> Unit)? = null,
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -37,12 +37,14 @@ fun TopBar(
             )
         },
         navigationIcon = {
-            IconButton(onClick = onNavigateUp) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Kembali",
-                    tint = Color(0XFF4B4544)
-                )
+            if(onNavigateUp != null) {
+                IconButton(onClick = onNavigateUp) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Kembali",
+                        tint = Color(0XFF4B4544)
+                    )
+                }
             }
         },
 

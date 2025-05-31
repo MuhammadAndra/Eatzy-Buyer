@@ -18,6 +18,17 @@ interface OrderApiService {
         @Body order: Order
     ): Response<Unit>
 
+    @GET("/orders")
+    suspend fun getOrdersByBuyerResponse(
+        @Header("authorization") token: String
+    ): Response<List<Order>>
+
+    @GET("/orders/{id}")
+    suspend fun getOrdersByIdResponse(
+        @Header("authorization") token: String,
+        @Path("id") orderId: Int
+    ): Response<Order>
+
     @GET("/canteens/{id}/order")
     suspend fun getOrderByCanteenId(
         @Header("authorization") token: String,
@@ -53,4 +64,10 @@ interface OrderApiService {
         @Header("authorization")token:String,
         @Body orderItemIds:List<Int>
     ):Response<Unit>
+
+    @POST("/orders/duplicate/{id}")
+    suspend fun duplicateOrderByIdResponse(
+        @Header("authorization") token: String,
+        @Path("id") orderId: Int
+    ): Response<Int>
 }

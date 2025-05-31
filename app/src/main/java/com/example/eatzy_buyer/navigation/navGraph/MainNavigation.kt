@@ -10,6 +10,7 @@ import com.example.eatzy_buyer.ui.screen.favorite.FavoriteScreen
 import com.example.eatzy_buyer.ui.screen.history.HistoryScreen
 import com.example.eatzy_buyer.ui.screen.home.HomeScreen
 import com.example.eatzy_buyer.ui.screen.editProfile.EditProfile
+import com.example.eatzy_buyer.ui.screen.history.HistoryScreen
 import com.example.eatzy_buyer.ui.screen.profile.ProfileScreen
 import kotlinx.serialization.Serializable
 
@@ -44,8 +45,20 @@ fun NavGraphBuilder.mainGraph(navController: NavController, viewModel: UserViewM
                 }
             )
         }
-        composable<History> {
-            HistoryScreen(navController = navController)
+        composable<History>{
+            HistoryScreen(
+                navController = navController,
+                onNavigateToMyOrder = { orderId ->
+                    navController.navigate(
+                        MyOrder(orderId)
+                    )
+                },
+                onNavigateToCart = { orderId ->
+                    navController.navigate(
+                        MyOrder(orderId)
+                    )
+                }
+            )
         }
         composable<Cart> {
             CartScreen(navController = navController, onCheckoutClick = { order_id ->

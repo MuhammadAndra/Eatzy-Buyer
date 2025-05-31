@@ -1,13 +1,11 @@
-package com.example.eatzy_buyer.ui.screen.history
+package com.example.eatzy_buyer.ui.screen.myOrder
 
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,24 +16,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.SoupKitchen
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,58 +55,50 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.example.eatzy_buyer.common.OrderUpdateNotifier
 import com.example.eatzy_buyer.data.model.Order
-import com.example.eatzy_buyer.data.model.OrderBadge
 import com.example.eatzy_buyer.data.model.OrderItem
 import com.example.eatzy_buyer.data.model.OrderStatus
 import com.example.eatzy_buyer.token
 import com.example.eatzy_buyer.ui.components.BottomNavBar
 import com.example.eatzy_buyer.ui.components.TopBar
-import com.example.eatzy_buyer.ui.screen.test.HistoryViewModel
+import com.example.eatzy_buyer.ui.screen.test.MyOrderViewModel
 import com.example.eatzy_buyer.ui.theme.EatzyOrange
 import com.example.eatzy_buyer.ui.theme.HeadingGray
 import com.example.eatzy_buyer.ui.theme.HeadingLightGray
-import kotlinx.coroutines.launch
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
 import java.util.Locale
 
 
 
 @Composable
-fun HistoryScreen(
+fun MyOrderScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    onNavigateToMyOrder: (Int) -> Unit,
-    onNavigateToCart: (Int) -> Unit
+    orderId: Int,
+    onNavigateup: () -> Unit
 ) {
 
-    val vm: HistoryViewModel = viewModel()
-    val orders by vm.orders.collectAsStateWithLifecycle(emptyList())
+    val vm: MyOrderViewModel = viewModel()
+    val order by vm.order.collectAsStateWithLifecycle(Order())
     val trigger by OrderUpdateNotifier.trigger.collectAsState()
-    val duplicatedOrderId by vm.duplicatedOrderId.collectAsState()
     val isLoading by vm.isLoading.collectAsStateWithLifecycle()
 
     LaunchedEffect(trigger) {
-        vm.fetchOrdersByBuyerResponse(token = token)
+        vm.fetchOrdersByIdResponse(token = token, orderId = orderId)
     }
 
     LaunchedEffect(Unit) {
-        vm.fetchOrdersByBuyerResponse(token = token)
-    }
-
-    LaunchedEffect(duplicatedOrderId) {
-        duplicatedOrderId?.let { newId ->
-            onNavigateToCart(newId)
-            vm.clearDuplicatedOrderId()
-        }
+        vm.fetchOrdersByIdResponse(token = token, orderId = orderId)
     }
 
     Scaffold(
         bottomBar = { BottomNavBar(navController) },
-        topBar = { TopBar(
-            modifier = Modifier,
-            title = "History"
-        ) }
+        topBar = {
+            TopBar(
+                modifier = Modifier,
+                title = "Pesanan Saya",
+                onNavigateUp = onNavigateup
+            )
+        }
     ) { innerPadding ->
         if(isLoading) {
             Box(
@@ -116,78 +107,55 @@ fun HistoryScreen(
             ) {
                 CircularProgressIndicator(color = EatzyOrange)
             }
-        } else  {
-            Column(
-                modifier = Modifier.padding(innerPadding)
-            ) {
-                Box(
-                    modifier = Modifier.padding(horizontal = 16.dp)
+        } else {
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+//                .fillMaxSize()
                 ) {
+
+                    MyOrderHeading(order = order)
+//            Spacer(modifier = Modifier.height(16.dp))
                     LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         item {
-                            Spacer(modifier = Modifier.height(1.dp))
-                        }
-                        items(orders) { order ->
-                            OrderHistory(onNavigateToMyOrder = onNavigateToMyOrder, order, vm)
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                         item {
-                            Spacer(modifier = Modifier.height(1.dp))
+                            Text(
+                                text = order.canteen.name,
+//                    fontWeight = FontWeight.Medium,
+                                color = HeadingLightGray,
+                                fontSize = 16.sp
+                            )
+                            Text(
+                                text = "Rincian Menu",
+                                fontWeight = FontWeight.Bold,
+                                color = HeadingGray,
+                                fontSize = 16.sp
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            OrderCard(order = order)
                         }
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+
                     }
                 }
             }
-        }
+
     }
 }
 
 @Composable
-fun OrderHistory(
-    onNavigateToMyOrder: (Int) -> Unit,
-    order: Order,
-    vm: HistoryViewModel
-) {
-
-    val scope = rememberCoroutineScope()
-
-    val orderBadge = when (order.status) {
-        OrderStatus.CANCELED -> OrderBadge(
-            text = "Dibatalkan",
-            textColor = Color(0xFFfee2e2),
-            backgroundColor = Color(0xFF991b1b),
-        )
-        OrderStatus.WAITING -> OrderBadge(
-            text = "Menunggu Konfirmasi",
-            textColor = Color(0xFF1f2937),
-            backgroundColor = Color(0xFFf3f4f6),
-        )
-        OrderStatus.PROCESSING -> OrderBadge(
-            text = "Diproses",
-            textColor = Color(0xFF92400e),
-            backgroundColor = Color(0xFFfef3c7),
-        )
-        OrderStatus.FINISHED -> OrderBadge(
-            text = "Selesai",
-            textColor = Color(0xFF065f46),
-            backgroundColor = Color(0xFFd1fae5),
-        )
-        else -> OrderBadge(
-            text = "Tidak diketahui",
-            textColor = Color(0xFF1f2937),
-            backgroundColor = Color(0xFFf3f4f6),
-        )
-    }
-
-    val orderButtonText = when (order.status) {
-        OrderStatus.CANCELED -> "Pesan Lagi"
-        OrderStatus.WAITING -> "Lihat"
-        OrderStatus.PROCESSING -> "Lihat"
-        OrderStatus.FINISHED -> "Pesan Lagi"
-        else -> "Pesan Lagi"
-    }
-
+fun OrderCard(modifier: Modifier = Modifier, order: Order) {
     ElevatedCard(
+//        modifier = Modifier
+//            .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
         ),
@@ -197,44 +165,6 @@ fun OrderHistory(
         shape = RoundedCornerShape(16.dp),
     ) {
         Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Column() {
-                Text(
-                    text = SimpleDateFormat(
-                        "dd MMMM yyyy",
-                        Locale("id", "ID")
-                    ).format(
-                        SimpleDateFormat(
-                            "yyyy-MM-dd HH:mm:ss",
-                            Locale.getDefault()
-                        ).parse("2025-05-06 14:23:45")
-                    ),
-                    fontWeight = FontWeight.Medium,
-                    lineHeight = 1.em,
-                    color = HeadingGray,
-                    fontSize = 13.sp
-                )
-                Text(
-                    text = order.canteen.name,
-                    fontWeight = FontWeight.Bold,
-                    color = HeadingGray,
-                    fontSize = 16.sp
-                )
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Label(orderBadge.text, orderBadge.textColor, orderBadge.backgroundColor )
-            }
-
-        }
 
         Column {
             val groupedItems = order.orderItem.groupBy { item ->
@@ -252,89 +182,118 @@ fun OrderHistory(
                             item.menu.id == menuId &&
                             item.addOns.sortedBy { it.id }.joinToString(",") { it.id.toString() } == addonsKey
                 }
-                HistoryItem(representativeItem, quantity)
+                MyOrderItem(representativeItem, quantity)
             }
         }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Column(
-                    modifier = Modifier.padding(top = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(0.dp)
-                ) {
-                    Text(
-                        text = order.orderItem.count().toString() + " Menu",
-                        lineHeight = 1.em,
-                        color = HeadingGray,
-                        fontSize = 14.sp
-                    )
-                    Text(
-                        text = "Total: " + NumberFormat.getCurrencyInstance(Locale("in", "ID"))
-                            .format(order.totalPrice),
-                        fontWeight = FontWeight.Medium,
-                        color = HeadingGray,
-                        fontSize = 16.sp,
-                    )
-                }
-
-                ElevatedButton(
-                    onClick = {
-                        if (order.status == OrderStatus.PROCESSING || order.status == OrderStatus.WAITING) {
-                            onNavigateToMyOrder(order.id)
-                        } else {
-                            scope.launch {
-                                vm.duplicateOrderByIdResplonse(token, order.id)
-                            }
-                        }
-                              },
-                    modifier = Modifier.height(28.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
-                    elevation = ButtonDefaults.buttonElevation(
-                        defaultElevation = 3.dp,
-                    ),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = EatzyOrange,
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text(
-                        text = orderButtonText,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp
-                    )
-                }
-            }
-
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            text = "Total: " + NumberFormat.getCurrencyInstance(Locale("in", "ID"))
+                .format(order.totalPrice),
+            fontWeight = FontWeight.Medium,
+            color = HeadingGray,
+            fontSize = 16.sp
+        )
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
 @Composable
-fun Label(text: String, textColor: Color, backgroundColor: Color) {
-    Box(
-        modifier = Modifier
-            .background(color = backgroundColor, shape = RoundedCornerShape(6.dp))
-            .padding(horizontal = 5.dp, vertical = 5.dp)
-    ) {
-        Text(
-            text = text,
-            color = textColor,
-            fontSize = 14.sp,
-            lineHeight = 1.em,
-            fontWeight = FontWeight.Medium
-        )
+fun MyOrderHeading(
+    order: Order
+) {
+    val statusMessage = when (order.status) {
+        OrderStatus.CANCELED -> "Pesanan Dibatalkan Oleh Penjual"
+        OrderStatus.WAITING -> "Menunggu Konfirmasi Penjual"
+        OrderStatus.PROCESSING -> "Pesanan Diproses"
+        OrderStatus.FINISHED -> "Pesanan Selesai"
+        OrderStatus.INCART -> "Pesanan Dalam Keranjang"
+        else -> "Order status tidak diketahui"
     }
+
+    val statusProgress = when (order.status) {
+        OrderStatus.WAITING -> 1
+        OrderStatus.PROCESSING -> 2
+        OrderStatus.FINISHED -> 3
+        else -> 0
+    }
+
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp),
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = statusMessage,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = HeadingGray
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Estimasi selesai: " + order.estimationTime + " - " + (order.estimationTime + 10) + " menit",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = HeadingGray
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                modifier = Modifier.padding(end = 16.dp),
+                imageVector = Icons.Filled.ReceiptLong,
+                contentDescription = "Order",
+                tint = if (statusProgress >= 1) EatzyOrange else Color.Gray
+            )
+            if (statusProgress == 1) {
+                LinearProgressIndicator(
+                    modifier = Modifier.weight(1f),
+                    color = EatzyOrange,
+                    trackColor = Color.Gray,
+                )
+            } else {
+                LinearProgressIndicator(
+                    progress = if (statusProgress > 1) 1.0f else 0.0f,
+                    modifier = Modifier.weight(1f),
+                    color = EatzyOrange,
+                    trackColor = Color.Gray,
+                )
+            }
+            Icon(
+                modifier = Modifier.padding(end = 16.dp, start = 16.dp),
+                imageVector = Icons.Filled.SoupKitchen,
+                contentDescription = "Order",
+                tint = if (statusProgress >= 2) EatzyOrange else Color.Gray
+            )
+            if (statusProgress == 2) {
+                LinearProgressIndicator(
+                    modifier = Modifier.weight(1f),
+                    color = EatzyOrange,
+                    trackColor = Color.Gray,
+                )
+            } else {
+                LinearProgressIndicator(
+                    progress = if (statusProgress > 2) 1.0f else 0.0f,
+                    modifier = Modifier.weight(1f),
+                    color = EatzyOrange,
+                    trackColor = Color.Gray,
+                )
+            }
+            Icon(
+                modifier = Modifier.padding(start = 16.dp),
+                imageVector = Icons.Filled.CheckCircle,
+                contentDescription = "Order",
+                tint = if (statusProgress >= 3) EatzyOrange else Color.Gray
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+    Divider(color = Color.LightGray, thickness = 1.dp)
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun HistoryItem(orderItem: OrderItem, quantity: Int) {
+fun MyOrderItem(orderItem: OrderItem, quantity: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -387,13 +346,13 @@ fun HistoryItem(orderItem: OrderItem, quantity: Int) {
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp,
-                            lineHeight = 1.em,
+                            lineHeight = 1.sp
                         )
                     }
                     Text(
                         text = orderItem.menu.name,
                         fontSize = 16.sp,
-                        lineHeight = 1.em,
+                        lineHeight = 13.sp,
                         fontWeight = FontWeight.Medium,
                         color = HeadingGray,
                         maxLines = 2,
@@ -404,7 +363,8 @@ fun HistoryItem(orderItem: OrderItem, quantity: Int) {
                 Spacer(Modifier.width(4.dp))
 
                 Text(
-                    text = NumberFormat.getCurrencyInstance(Locale("in", "ID")).format(orderItem.menu.price),
+                    text = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
+                        .format(orderItem.menu.price),
                     fontSize = 16.sp,
                     color = HeadingGray
                 )
@@ -413,11 +373,11 @@ fun HistoryItem(orderItem: OrderItem, quantity: Int) {
 //                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
-                    text = orderItem.addOns.joinToString(", ") { addon -> addon.name },
+                    text = orderItem.addOns.joinToString(", ") { it.name },
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = HeadingLightGray,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
                 Row(
@@ -444,16 +404,18 @@ fun HistoryItem(orderItem: OrderItem, quantity: Int) {
                 }
             }
         }
+
     }
+
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun HistoryPreview() {
-////    OrderHistory(onNavigateToMyOrder = {})
-//    HistoryScreen(
-//        modifier = Modifier,
-//        navController = rememberNavController(),
-//        onNavigateToMyOrder = {}
-//    )
-//}
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun MyOrderPreview() {
+    MyOrderScreen(
+        modifier = Modifier,
+        navController = rememberNavController(),
+        onNavigateup = {},
+        orderId = 1,
+    )
+}

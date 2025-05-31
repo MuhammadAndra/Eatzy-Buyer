@@ -4,9 +4,15 @@ import com.google.gson.annotations.SerializedName
 
 data class MenuCategory(
     @SerializedName("menu_category_id")
-    val id:Int = 1,
+    val id: Int = 0,
+
     @SerializedName("menu_category_name")
     val name:String = "",
+
+    @SerializedName("canteen")
+    val canteen: Canteen = Canteen(),
+
     @SerializedName("menus")
     val menus:List<Menu> = emptyList()
+
 )
