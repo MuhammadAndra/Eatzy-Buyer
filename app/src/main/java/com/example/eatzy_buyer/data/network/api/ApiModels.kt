@@ -1,6 +1,6 @@
 package com.example.eatzy_buyer.data.network.api
 
-data class RegisterRequest(val name: String, val email: String, val password: String)
+data class RegisterRequest(val name: String, val email: String, val password: String, val role:String = "buyer")
 data class RegisterResponse(val message: String?, val error: String?)
 data class LoginRequest(val email: String, val password: String)
 data class LoginResponse(val token: String?, val error: String?)

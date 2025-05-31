@@ -44,7 +44,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = AuthGraph) {
         authGraph(navController, viewModel)
         mainGraph(navController, viewModel)
-        homeGraph(navController, viewModel)
-        testGraph(navController, viewModel)
+        homeGraph(navController )
+        testGraph(navController)
     }
 }
