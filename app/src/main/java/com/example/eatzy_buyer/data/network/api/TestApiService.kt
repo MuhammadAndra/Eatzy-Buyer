@@ -7,12 +7,17 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 
 interface TestApiService {
+    //api test ambil all user
+    //ini pakai Thread
+    @GET("/users")
+    fun getUsers(): Call<List<User>>
+
+    //ini pakai coroutine
+//    @GET("/users")
+//    suspend fun getUsersResponse(
+//        @Header("authorization") token: String
+//    ): Response<List<User>>
     @GET("/users")
     suspend fun getUsersResponse(
-        @Header("authorization") token: String
     ): Response<List<User>>
-
-    //api test ambil all user versi pak aryo
-//    @GET("/users")
-//    fun getUsers(@Header("authorization") token: String): Call<List<User>>
 }

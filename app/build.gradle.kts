@@ -87,6 +87,10 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation ("com.google.code.gson:gson:2.10.1")
 
+    implementation ("com.github.bumptech.glide:compose:1.0.0-beta01")
+    implementation("io.coil-kt.coil3:coil-compose:3.2.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

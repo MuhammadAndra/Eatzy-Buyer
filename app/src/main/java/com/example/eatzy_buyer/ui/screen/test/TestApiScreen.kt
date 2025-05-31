@@ -21,15 +21,17 @@ fun TestApiScreen(
 
 ) {
     val vm: TestApiViewModel = viewModel()
-//    val users by vm.users.collectAsStateWithLifecycle()
-    val users by vm.users.collectAsStateWithLifecycle(emptyList())
+    val users by vm.users.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) { vm.fetchUsersResponse(token = token) }
+    LaunchedEffect(Unit) {
+//        vm.fetchUsers()
+        vm.fetchUsersSuspend(token = token)
+    }
     Scaffold { innerpadding ->
         Column(modifier = Modifier.padding(innerpadding)) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                items(users) { user ->
-                    Text("${user.name} - ${user.email}")
+                items(users){user ->
+                    Text("${user.username} - ${user.email}")
                 }
             }
         }

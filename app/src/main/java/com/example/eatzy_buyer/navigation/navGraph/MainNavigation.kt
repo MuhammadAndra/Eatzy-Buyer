@@ -1,4 +1,3 @@
-// navigation/navGraph/MainGraph.kt
 package com.example.eatzy_buyer.navigation.navGraph
 
 import androidx.navigation.NavController
@@ -35,7 +34,15 @@ object EditProfile
 fun NavGraphBuilder.mainGraph(navController: NavController, viewModel: UserViewModel) {
     navigation<MainGraph>(startDestination = Home) { // Use MainGraph as the parent route
         composable<Home> {
-            HomeScreen(navController = navController)
+            HomeScreen(
+                navController = navController,
+                onNavigateToSearchScreen = { navController.navigate(Search) },
+                onNavigateToListMenuScreen = { canteenId ->
+                    navController.navigate(
+                        ListMenu(canteenId = canteenId)
+                    )
+                }
+            )
         }
         composable<History> {
             HistoryScreen(navController = navController)

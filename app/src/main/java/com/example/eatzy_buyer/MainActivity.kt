@@ -1,4 +1,3 @@
-// MainActivity.kt
 package com.example.eatzy_buyer
 
 import android.os.Bundle
@@ -28,3 +27,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
+
+
