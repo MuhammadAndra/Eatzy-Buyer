@@ -15,21 +15,21 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-@Composable
-fun TestApiScreen(
-
-) {
-    val vm: TestApiViewModel = viewModel()
-    val users by vm.users.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) { vm.fetchUsers() }
-    Scaffold { innerpadding ->
-        Column(modifier = Modifier.padding(innerpadding)) {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                items(users){user ->
-                    Text("${user.name} - ${user.email}")
-                }
-            }
-        }
-    }
-}
+//@Composable
+//fun TestApiScreen(
+//
+//) {
+//    val vm: TestApiViewModel = viewModel()
+//    val users by vm.users.collectAsStateWithLifecycle()
+//
+//    LaunchedEffect(Unit) { vm.fetchUsers() }
+//    Scaffold { innerpadding ->
+//        Column(modifier = Modifier.padding(innerpadding)) {
+//            LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+//                items(users){user ->
+//                    Text("${user.name} - ${user.email}")
+//                }
+//            }
+//        }
+//    }
+//}

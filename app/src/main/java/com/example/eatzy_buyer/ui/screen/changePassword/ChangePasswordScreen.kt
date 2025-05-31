@@ -1,5 +1,6 @@
 package com.example.eatzy_buyer.ui.screen.changePassword
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -8,24 +9,61 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.eatzy_buyer.R
-import com.example.eatzy_buyer.ui.components.EmailTextField
+import com.example.eatzy_buyer.UserViewModel
+import com.example.eatzy_buyer.ui.components.OtpTextField
 import com.example.eatzy_buyer.ui.components.PasswordTextField
 import com.example.eatzy_buyer.ui.components.PrimaryButton
 
-@Preview(showBackground = true)
 @Composable
-fun ChangePasswordScreen(
-    onChangePasswordClick: (String, String) -> Unit= { _, _-> },
+fun ResetPasswordScreen(
+    email: String,
+    viewModel: UserViewModel,
+    onNavigateToLogin: () -> Unit
 ) {
-    var password by remember { mutableStateOf("") }
-    var passwordConfirm by remember { mutableStateOf("") }
+    var otp by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    val resetPasswordState by viewModel.resetPasswordState.collectAsState()
+    val context = LocalContext.current
+
+    // Handle reset password response
+    LaunchedEffect(resetPasswordState) {
+        when {
+            resetPasswordState.success -> {
+                isLoading = false
+                Toast.makeText(context, "Password berhasil direset", Toast.LENGTH_LONG).show()
+                onNavigateToLogin()
+                viewModel.resetAuthStates()
+            }
+            resetPasswordState.error != null -> {
+                isLoading = false
+                Toast.makeText(context, resetPasswordState.error, Toast.LENGTH_LONG).show()
+                viewModel.resetAuthStates()
+            }
+        }
+    }
+
+    fun validateInputs(): String? {
+        return when {
+            otp.isBlank() -> "Kode OTP tidak boleh kosong"
+            otp.length != 6 -> "Kode OTP harus 6 digit"
+            newPassword.isBlank() -> "Password baru tidak boleh kosong"
+            newPassword.length < 6 -> "Password minimal 6 karakter"
+            confirmPassword.isBlank() -> "Konfirmasi password tidak boleh kosong"
+            newPassword != confirmPassword -> "Password dan konfirmasi tidak sama"
+            else -> null
+        }
+    }
 
     Scaffold { innerPadding ->
         Box(
@@ -34,7 +72,7 @@ fun ChangePasswordScreen(
                 .padding(innerPadding)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.bg_login), // Ganti dengan nama file Anda
+                painter = painterResource(id = R.drawable.bg_login),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.matchParentSize()
@@ -46,73 +84,116 @@ fun ChangePasswordScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Judul
                 Text(
-                    text = "Lupa Kata Sandi",
-                    style = MaterialTheme.typography.headlineMedium
+                    text = "Reset Kata Sandi",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color(0xFFF59A2F),
+                    fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                // Form Login + Fitur tambahan
+                Text(
+                    text = "Masukkan kode OTP yang telah dikirim ke $email dan password baru Anda",
+                    color = Color(0xff4b4544),
+                    fontSize = 14.sp,
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
                 Column(
                     horizontalAlignment = Alignment.Start,
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    // OTP Field
                     Text(
-                        text = "Ubah Kata Sandi",
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFF59A2F),
-                        fontSize = 20.sp,
+                        text = "Kode OTP",
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xff4b4544)
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ",
-                        color = Color(0xff4b4544),
-                        fontSize = 14.sp,
+                    OtpTextField(
+                        value = otp,
+                        onValueChange = { if (it.length <= 6) otp = it },
+                        enabled = !isLoading
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Password
-                    Text(text = "Kata Sandi")
+                    // New Password Field
+                    Text(
+                        text = "Password Baru",
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xff4b4544)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     PasswordTextField(
-                        value = password,
-                        onValueChange = { password = it },
+                        value = newPassword,
+                        onValueChange = { newPassword = it },
                         passwordVisible = passwordVisible,
-                        onVisibilityToggle = { passwordVisible = !passwordVisible }
+                        onVisibilityToggle = { passwordVisible = !passwordVisible },
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Confirm Password Field
+                    Text(
+                        text = "Konfirmasi Password",
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xff4b4544)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(text = "Konfirmasi Kata Sandi")
-                    EmailTextField(
-                        value = passwordConfirm,
-                        onValueChange = { passwordConfirm = it },
+                    PasswordTextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        passwordVisible = confirmPasswordVisible,
+                        onVisibilityToggle = { confirmPasswordVisible = !confirmPasswordVisible },
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
 
+                PrimaryButton(
+                    text = if (isLoading) "Mereset..." else "Reset Password",
+                    onClick = {
+                        val validation = validateInputs()
+                        if (validation != null) {
+                            Toast.makeText(context, validation, Toast.LENGTH_SHORT).show()
+                        } else {
+                            isLoading = true
+                            viewModel.resetPassword(email, otp, newPassword)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isLoading
+                )
+
+                if (isLoading) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    CircularProgressIndicator(
+                        color = Color(0xFFF59A2F)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Tombol Daftar
-                PrimaryButton(
-                    text = "Reset Kata Sandi",
-                    onClick = { onChangePasswordClick(password, passwordConfirm) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
+                // Resend OTP option
+                TextButton(
+                    onClick = {
+                        viewModel.forgotPassword(email)
+                        Toast.makeText(context, "OTP baru telah dikirim", Toast.LENGTH_SHORT).show()
+                    },
+                    enabled = !isLoading
+                ) {
+                    Text(
+                        text = "Kirim ulang OTP",
+                        color = Color(0xFFF59A2F)
+                    )
+                }
             }
         }
     }
 }
-
-
-
-
-
