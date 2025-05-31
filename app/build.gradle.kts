@@ -82,6 +82,9 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
     implementation(libs.androidx.runtime.livedata)
 
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
