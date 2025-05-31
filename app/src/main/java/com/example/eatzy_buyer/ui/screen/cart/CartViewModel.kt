@@ -14,7 +14,7 @@ class CartViewModel : ViewModel() {
     val cart: StateFlow<List<Cart>> = _cart
 
     // Ganti token dengan milikmu yang valid
-    private val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJqYWVAZ21haWwuY29tIiwicm9sZSI6ImJ1eWVyIiwiaWF0IjoxNzQ4NTAxMzkxLCJleHAiOjE3NjQwNTMzOTF9.u-wWG5HUz9fUOj2KhYDjm8SjjjCzdT9yeqqFW_ezzlo"
+    private val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJqYWVAZ21haWwuY29tIiwicm9sZSI6ImJ1eWVyIiwiaWF0IjoxNzQ4NjY4NzAyLCJleHAiOjE3NjQyMjA3MDJ9.qVuuBVMBCGwXE2wuFwZsl1hYoG99EG4ck7tPpNFCFF0"
     private val repository = CartRepository(RetrofitClient.cartApi)
 
     fun fetchCartFromApi() {

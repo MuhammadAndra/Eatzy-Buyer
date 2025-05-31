@@ -11,7 +11,7 @@ fun NavGraphBuilder.confirmationGraph(
     navController: NavHostController,
 ) {
     composable(
-        route = "confirmation/confirmed/{order_id}",
+        route = "confirmation/{order_id}",
         arguments = listOf(navArgument("order_id") { type = NavType.IntType })
     ) { backStackEntry ->
         val order_id = backStackEntry.arguments?.getInt("order_id") ?: 0

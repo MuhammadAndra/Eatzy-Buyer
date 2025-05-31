@@ -83,7 +83,7 @@ fun CartScreen(
             ) {
                 items(cart) { cart ->
                     CartCard(cart = cart) { order_id ->
-                        navController.navigate("confirmation/confirmed/$order_id")
+                        navController.navigate("confirmation/$order_id")
                         }
 
                     Spacer(modifier = Modifier.height(12.dp))

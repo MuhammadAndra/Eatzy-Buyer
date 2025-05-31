@@ -30,7 +30,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
     }
     composable<Cart> {
         CartScreen(navController = navController, onCheckoutClick = { order_id ->
-            navController.navigate("confirmation/confirmed/$order_id")
+            navController.navigate("confirmation/$order_id")
         })
     }
 

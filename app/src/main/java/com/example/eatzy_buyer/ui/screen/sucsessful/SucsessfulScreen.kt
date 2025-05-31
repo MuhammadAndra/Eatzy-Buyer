@@ -1,6 +1,7 @@
 package com.example.eatzy_buyer.ui.screen.successful
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -19,13 +20,17 @@ import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun SuccessfulScreen(navController: NavController) {
-    // Paksa tampilan tetap Light Mode
     MaterialTheme(colorScheme = lightColorScheme()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White) // Pastikan latar belakang putih
+                .background(Color.White)
                 .padding(24.dp)
+//                .clickable {
+//                    navController.navigate("home") {
+//                        popUpTo("home") { inclusive = true } // supaya tidak bisa back
+//                    }
+//                }
         ) {
             Column(
                 modifier = Modifier
@@ -72,6 +77,7 @@ fun SuccessfulScreen(navController: NavController) {
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

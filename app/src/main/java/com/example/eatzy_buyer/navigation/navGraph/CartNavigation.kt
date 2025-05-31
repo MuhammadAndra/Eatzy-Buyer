@@ -12,7 +12,7 @@ fun NavGraphBuilder.cartGraph(
         CartScreen(
             navController = navController,
             onCheckoutClick = { order_id ->       // <-- ini harus sesuai tipe Int
-                navController.navigate("confirmation/confirmed/$order_id")
+                navController.navigate("confirmation/$order_id")
             }
         )
     }

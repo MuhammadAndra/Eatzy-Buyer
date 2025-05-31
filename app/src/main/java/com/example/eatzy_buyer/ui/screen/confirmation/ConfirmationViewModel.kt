@@ -8,47 +8,49 @@ import com.example.eatzy_buyer.data.repository.ConfirmationRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalTime
 
 class ConfirmationViewModel : ViewModel() {
+
     private val repository = ConfirmationRepository()
 
     private val _confirmation = MutableStateFlow<Confirmation?>(null)
     val confirmation: StateFlow<Confirmation?> = _confirmation
 
     private val token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJqYWVAZ21haWwuY29tIiwicm9sZSI6ImJ1eWVyIiwiaWF0IjoxNzQ4NTAxMzkxLCJleHAiOjE3NjQwNTMzOTF9.u-wWG5HUz9fUOj2KhYDjm8SjjjCzdT9yeqqFW_ezzlo"
-    // ✅ Ambil order berdasarkan orderId
-    fun fetchOrderById(order_id: Int) {
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJqYWVAZ21haWwuY29tIiwicm9sZSI6ImJ1eWVyIiwiaWF0IjoxNzQ4NjY4NzAyLCJleHAiOjE3NjQyMjA3MDJ9.qVuuBVMBCGwXE2wuFwZsl1hYoG99EG4ck7tPpNFCFF0"
+
+    fun fetchOrderById(orderId: Int) {
         viewModelScope.launch {
-            val result = repository.getOrderById(order_id, token)
+            val result = repository.getOrderById(orderId, token)
             result.onSuccess {
                 _confirmation.value = it
-                Log.d("ConfirmationVM", "Berhasil ambil data order_id $order_id: $it")
+                Log.d("ConfirmationVM", "Order fetched: $it")
             }.onFailure {
-                Log.e("ConfirmationVM", "Gagal ambil data order_id $order_id: ${it.message}")
+                Log.e("ConfirmationVM", "Failed to fetch order $orderId: ${it.message}")
             }
         }
     }
 
-    fun fetchConfirmation() {
-        viewModelScope.launch {
-            val result = repository.getConfirmedOrder(token)
-            result.onSuccess {
-                _confirmation.value = it
-                Log.d("ConfirmationVM", "Berhasil ambil data: $it")
-            }.onFailure {
-                Log.e("ConfirmationVM", "Gagal ambil data: ${it.message}")
-            }
+    fun confirmOrder(
+        order_id: Int,
+        pickedTime: LocalTime?,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (_confirmation.value == null) {
+            onError("Data pesanan belum tersedia.")
+            return
         }
-    }
 
-    fun confirmOrder(onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
-            val result = repository.confirmOrder(token)
+            val result = repository.confirmOrder(order_id, pickedTime, token)
             result.onSuccess {
+                Log.d("ConfirmationVM", "Order confirmed successfully")
                 onSuccess()
             }.onFailure {
-                onError(it.message ?: "Terjadi kesalahan")
+                Log.e("ConfirmationVM", "Failed to confirm order $order_id: ${it.message}")
+                onError("Gagal mengonfirmasi pesanan: ${it.message}")
             }
         }
     }

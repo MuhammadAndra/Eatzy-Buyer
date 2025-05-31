@@ -7,24 +7,22 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ConfirmApiService {
 
-    @GET("order/confirmed")
-    suspend fun getConfirmedOrder(
-        @Header("Authorization") token: String
-    ): Response<Confirmation> // <-- ini harus Response<>
-
-    @POST("order/confirm")
+    @PATCH("confirmation/confirm/{order_id}")
     suspend fun confirmOrder(
+        @Path("order_id") order_id: Int,
+        @Query("time") time: String?,    // Kirim waktu pesan untuk nanti, nullable
         @Header("Authorization") token: String
-    ): Response<Unit> // <-- harus Response juga!
+    ): Response<Unit>
 
-    @GET("confirmation/confirmed/{order_id}")
+    @GET("confirmation/{order_id}")
     suspend fun getOrderById(
-        @Path("order_id") orderId: Int,
+        @Path("order_id") order_id: Int,
         @Header("Authorization") token: String
     ): Response<Confirmation>
 }
-

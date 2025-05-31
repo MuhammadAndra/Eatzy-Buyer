@@ -217,11 +217,16 @@ fun ConfirmationScreen(
             Button(
                 onClick = {
                     viewModel.confirmOrder(
+                        order_id = order_id,
+                        pickedTime = if (isNowSelected) null else pickedTime,
                         onSuccess = {
                             Toast.makeText(context, "Pesanan berhasil dikonfirmasi", Toast.LENGTH_SHORT).show()
-                            onOrderClick()
+                            navController.navigate("success") {
+                                popUpTo("confirmation") { inclusive = true }
+                            }
                         },
                         onError = {
+                            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                         }
                     )
                 },
