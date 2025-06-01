@@ -37,9 +37,9 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
         viewModelScope.launch { repository.register(name, email, password) }
     }
 
-    fun login(email: String, password: String) {
+    fun login(email: String, password: String, deviceToken: String) {
         viewModelScope.launch {
-            repository.login(email, password)
+            repository.login(email, password, deviceToken)
             if (loginState.value.success) {
                 fetchUserDetails()
             }

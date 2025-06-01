@@ -21,6 +21,8 @@ import com.example.eatzy_buyer.R
 import com.example.eatzy_buyer.UserViewModel
 import com.example.eatzy_buyer.ui.components.PasswordTextField
 import com.example.eatzy_buyer.ui.components.PrimaryButton
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,6 +36,7 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var deviceToken by remember { mutableStateOf("") }
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -58,6 +61,18 @@ fun LoginScreen(
         if (userState.error != null) {
             Log.d("LoginScreen", "User state error: ${userState.error}")
             scope.launch { Toast.makeText(context, userState.error, Toast.LENGTH_SHORT).show() }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        Firebase.messaging.token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+
+            deviceToken = task.result
+            Log.d("FCM", "FCM Token: $deviceToken")
         }
     }
 
@@ -123,7 +138,7 @@ fun LoginScreen(
                 } else {
                     PrimaryButton(
                         text = "Masuk",
-                        onClick = { viewModel.login(email, password) },
+                        onClick = { viewModel.login(email, password, deviceToken) },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !loginState.isLoading
                     )

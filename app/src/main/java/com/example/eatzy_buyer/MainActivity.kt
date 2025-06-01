@@ -23,17 +23,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         try {
             setContent {
-                LaunchedEffect(Unit) {
-                    Firebase.messaging.token.addOnCompleteListener { task ->
-                        if (!task.isSuccessful) {
-                            Log.w("FCM", "Fetching FCM registration token failed", task.exception)
-                            return@addOnCompleteListener
-                        }
-
-                        val token = task.result
-                        Log.d("FCM", "FCM Token: $token")
-                    }
-                }
+//                LaunchedEffect(Unit) {
+//                    Firebase.messaging.token.addOnCompleteListener { task ->
+//                        if (!task.isSuccessful) {
+//                            Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+//                            return@addOnCompleteListener
+//                        }
+//
+//                        val token = task.result
+//                        Log.d("FCM", "FCM Token: $token")
+//                    }
+//                }
                 EatzyBuyerTheme {
                     AppNavigation()
                 }

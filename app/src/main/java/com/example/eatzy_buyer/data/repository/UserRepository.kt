@@ -70,10 +70,10 @@ class UserRepository(private val context: Context) {
         }
     }
 
-    suspend fun login(email: String, password: String) {
+    suspend fun login(email: String, password: String, deviceToken: String) {
         _loginState.value = _loginState.value.copy(isLoading = true)
         try {
-            val response = apiService.login(LoginRequest(email, password))
+            val response = apiService.login(LoginRequest(email, password, deviceToken))
             if (response.isSuccessful && response.body()?.token != null) {
                 val token = response.body()!!.token!!
                 sharedPreferences.edit()
