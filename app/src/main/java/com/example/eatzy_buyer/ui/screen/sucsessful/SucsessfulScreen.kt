@@ -1,5 +1,6 @@
 package com.example.eatzy_buyer.ui.screen.successful
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,13 +20,15 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun SuccessfulScreen(navController: NavController) {
+fun SuccessfulScreen(navController: NavController,orderId:Int,onNavigateToMyOrder: (orderId:Int) -> Unit) {
     MaterialTheme(colorScheme = lightColorScheme()) {
+        Log.d("","$orderId")
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(24.dp)
+                .clickable { onNavigateToMyOrder(orderId) }
 //                .clickable {
 //                    navController.navigate("home") {
 //                        popUpTo("home") { inclusive = true } // supaya tidak bisa back
@@ -83,5 +86,5 @@ fun SuccessfulScreen(navController: NavController) {
 @Composable
 fun PreviewSuccessfulScreen() {
     val navController = rememberNavController()
-    SuccessfulScreen(navController = navController)
+    SuccessfulScreen(navController = navController, orderId = 0, onNavigateToMyOrder = {})
 }

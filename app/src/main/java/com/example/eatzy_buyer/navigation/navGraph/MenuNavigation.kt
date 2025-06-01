@@ -47,7 +47,9 @@ fun NavGraphBuilder.menuGraph(navController: NavController) {
                     )
                 )
             },
-            onNavigateToCart = {}
+            onNavigateToCart = { orderId ->
+                navController.navigate(route = "confirmation/$orderId")
+            }
         )
     }
     composable<AddMenu> { backStackEntry ->

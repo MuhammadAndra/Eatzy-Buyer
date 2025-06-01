@@ -45,7 +45,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController, viewModel: UserViewM
                 }
             )
         }
-        composable<History>{
+        composable<History> {
             HistoryScreen(
                 navController = navController,
                 onNavigateToMyOrder = { orderId ->
@@ -53,11 +53,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController, viewModel: UserViewM
                         MyOrder(orderId)
                     )
                 },
-                onNavigateToCart = { orderId ->
-                    navController.navigate(
-                        MyOrder(orderId)
-                    )
-                }
+                onNavigateToCart = {navController.navigate(Cart)}
             )
         }
         composable<Cart> {
@@ -66,7 +62,14 @@ fun NavGraphBuilder.mainGraph(navController: NavController, viewModel: UserViewM
             })
         }
         composable<Favorite> {
-            FavoriteScreen(navController = navController)
+            FavoriteScreen(
+                navController = navController,
+                onNavigateToOrder = { canteenId ->
+//                    navController.navigate(Cart)
+                    navController.navigate(
+                        ListMenu(canteenId = canteenId)
+                    )
+                })
         }
         composable<Profile> {
             ProfileScreen(

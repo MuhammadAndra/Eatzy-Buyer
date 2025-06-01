@@ -42,7 +42,8 @@ fun ConfirmationScreen(
     navController: NavController,
     order_id: Int,
     onOrderClick: () -> Unit,
-    viewModel: ConfirmationViewModel = viewModel()
+    viewModel: ConfirmationViewModel = viewModel(),
+    onNavigateToListMenu: (canteenId: Int) -> Unit
 ){
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -206,7 +207,7 @@ fun ConfirmationScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedButton(
-                onClick = { /* Tambah pesanan */ },
+                onClick = { onNavigateToListMenu(confirmation!!.canteen_id) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 border = BorderStroke(1.dp, Color(0xFF455E84)),
@@ -236,7 +237,7 @@ fun ConfirmationScreen(
                         pickedTime = if (isNowSelected) null else pickedTime,
                         onSuccess = {
                             Toast.makeText(context, "Pesanan berhasil dikonfirmasi", Toast.LENGTH_SHORT).show()
-                            navController.navigate("success") {
+                            navController.navigate("success/$order_id") {
                                 popUpTo("confirmation") { inclusive = true }
                             }
                         },
@@ -414,6 +415,7 @@ fun PreviewConfirmationScreen() {
     ConfirmationScreen(
         navController = navController,
         order_id = 0, // tambahkan order_id supaya kompilasi lancar
-        onOrderClick = {}
+        onOrderClick = {},
+        onNavigateToListMenu = {}
     )
 }

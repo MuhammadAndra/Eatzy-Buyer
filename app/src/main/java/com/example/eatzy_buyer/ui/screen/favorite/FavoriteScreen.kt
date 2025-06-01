@@ -61,6 +61,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
@@ -87,7 +88,7 @@ import java.util.Locale
 fun FavoriteScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    onNavigateToOrder: () -> Unit,
+    onNavigateToOrder: (canteenId:Int) -> Unit,
 ) {
 
     var searchQuery by remember { mutableStateOf("") }
@@ -145,7 +146,9 @@ fun FavoriteScreen(
                     FavoriteItemCard(
                         Modifier,
                         favorite,
-                        onNavigateToOrder,
+                        onNavigateToOrder = { canteenId ->
+                            onNavigateToOrder(canteenId)
+                        },
                         vm = vm,
                         coroutineScope = coroutineScope,
                         token = token
@@ -164,7 +167,7 @@ fun FavoriteScreen(
 fun FavoriteItemCard(
     modifier: Modifier = Modifier,
     favorite: Menu,
-    onNavigateToOrder: () -> Unit,
+    onNavigateToOrder: (canteenId:Int) -> Unit,
     vm: FavoriteViewModel,
     coroutineScope: CoroutineScope,
     token: String?
@@ -190,7 +193,7 @@ fun FavoriteItemCard(
 
     ElevatedCard(
         modifier = Modifier,
-        onClick = onNavigateToOrder,
+        onClick = { onNavigateToOrder(favorite.category!!.canteen.id) },
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
         ),
@@ -205,24 +208,32 @@ fun FavoriteItemCard(
                 .padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            GlideImage(
-                model = favorite.imageUrl,
+            AsyncImage(model = favorite.imageUrl,
                 contentDescription = favorite.name,
                 modifier = Modifier
                     .size(100.dp)
                     .clip(RoundedCornerShape(10.dp)),
                 contentScale = ContentScale.Crop,
-                loading = placeholder({
-                    Box(
-                        modifier = Modifier
-                            .background(Color.White)
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = EatzyOrange)
-                    }
-                })
-            )
+                )
+//            GlideImage(
+//                model = favorite.imageUrl,
+//                contentDescription = favorite.name,
+//                modifier = Modifier
+//                    .size(100.dp)
+//                    .clip(RoundedCornerShape(10.dp)),
+//                contentScale = ContentScale.Crop,
+//                loading = placeholder({
+//                    Box(
+//                        modifier = Modifier
+//                            .background(Color.White)
+//                            .fillMaxSize(),
+//                        contentAlignment = Alignment.Center
+//                    ) {
+//                        CircularProgressIndicator(color = EatzyOrange)
+//                    }
+//                }
+//                )
+//            )
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -267,7 +278,7 @@ fun FavoriteItemCard(
             ) {
                 IconButton(
                     modifier = Modifier.size(25.dp),
-                    onClick = { onNavigateToOrder },
+                    onClick = { onNavigateToOrder(favorite.category!!.canteen.id) },
                     colors = IconButtonDefaults.iconButtonColors(EatzyOrange)
                 ) {
                     Icon(

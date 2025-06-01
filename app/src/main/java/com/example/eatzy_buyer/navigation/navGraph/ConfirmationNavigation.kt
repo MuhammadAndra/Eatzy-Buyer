@@ -19,7 +19,10 @@ fun NavGraphBuilder.confirmationGraph(
             navController = navController,
             order_id = order_id,
             onOrderClick = {
-                navController.navigate("success")
+                navController.navigate("success/$order_id")
+            },
+            onNavigateToListMenu = { canteenId ->
+                navController.navigate(ListMenu(canteenId = canteenId))
             }
         )
     }

@@ -87,7 +87,7 @@ fun ListMenuScreen(
     onNavigateUp: () -> Unit,
     canteenId: Int,
     onNavigateToAddMenu: (idCategoryMenu: Int?, menuId: Int, canteenId: Int, orderId: Int?, orderItemId: Int?, count: Int?, orderItemIds: List<Int>?) -> Unit,
-    onNavigateToCart: () -> Unit
+    onNavigateToCart: (orderId:Int) -> Unit,
 ) {
     val vm: ListMenuViewModel = viewModel()
     val menuCategories by vm.menuCategories.collectAsStateWithLifecycle()
@@ -327,7 +327,7 @@ fun ListMenuScreen(
                     GoToCartButton(
                         quantity = order!!.orderItem.size,
                         totalPrice = order!!.totalPrice,
-                        onNavigateToCart = onNavigateToCart
+                        onNavigateToCart = { onNavigateToCart(order!!.id) }
                     )
                 }
             }

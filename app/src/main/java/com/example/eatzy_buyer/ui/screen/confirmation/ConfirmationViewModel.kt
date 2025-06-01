@@ -18,7 +18,7 @@ class ConfirmationViewModel : ViewModel() {
     val confirmation: StateFlow<Confirmation?> = _confirmation
 
     private val token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjEsImVtYWlsIjoiY2F0dGxleWExNzI0QGdtYWlsLmNvbSIsInJvbGUiOiJidXllciIsImlhdCI6MTc0ODY4NzU4NSwiZXhwIjoxNzY0MjM5NTg1fQ.5Z6ZIUU8V2yjfyRx-C83EKY3Ru7hxvUguQnW3eHFC2w"
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoiY2F0dGxleWExNzI0QGdtYWlsLmNvbSIsInJvbGUiOiJidXllciIsImlhdCI6MTc0ODc0OTQwNywiZXhwIjoxNzY0MzAxNDA3fQ.H5Zy_L3hgFTV-lzjoUzEnW523EhRTqFOMXT1AYDiPjU"
 
     fun fetchOrderById(orderId: Int) {
         viewModelScope.launch {

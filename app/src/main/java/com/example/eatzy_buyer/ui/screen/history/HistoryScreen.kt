@@ -78,7 +78,7 @@ fun HistoryScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     onNavigateToMyOrder: (Int) -> Unit,
-    onNavigateToCart: (Int) -> Unit
+    onNavigateToCart: () -> Unit
 ) {
 
     val vm: HistoryViewModel = viewModel()
@@ -97,7 +97,7 @@ fun HistoryScreen(
 
     LaunchedEffect(duplicatedOrderId) {
         duplicatedOrderId?.let { newId ->
-            onNavigateToCart(newId)
+            onNavigateToCart()
             vm.clearDuplicatedOrderId()
         }
     }
@@ -432,15 +432,18 @@ fun HistoryItem(orderItem: OrderItem, quantity: Int) {
                         contentDescription = "Deskripsi",
                         tint = HeadingGray
                     )
-                    Text(
-                        text = orderItem.details,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = HeadingLightGray,
-                        lineHeight = 1.em,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    if (orderItem.details != null) {
+                        Text(
+                            text = orderItem.details,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = HeadingLightGray,
+                            lineHeight = 1.em,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
                 }
             }
         }
