@@ -73,7 +73,7 @@ fun HomeScreen(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(400.dp), // atur tinggi agar 2 baris terlihat
+                    .height(600.dp), // atur tinggi agar 2 baris terlihat
                 contentPadding = PaddingValues(8.dp),
                 verticalArrangement = Arrangement.spacedBy(13.dp),
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
@@ -86,7 +86,6 @@ fun HomeScreen(
                         canteen = canteen,
                     )
                 }
-
             }
         }
     }

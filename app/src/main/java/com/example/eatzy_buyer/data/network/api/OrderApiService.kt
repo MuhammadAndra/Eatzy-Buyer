@@ -23,7 +23,7 @@ interface OrderApiService {
         @Header("authorization") token: String
     ): Response<List<Order>>
 
-    @GET("/orders/{id}")
+    @GET("/orders/get/{id}")
     suspend fun getOrdersByIdResponse(
         @Header("authorization") token: String,
         @Path("id") orderId: Int

@@ -15,7 +15,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
 
 //tokennya taro sini, kalo apinya butuh authorisasi
-const val token ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoiY2F0dGxleWExNzI0QGdtYWlsLmNvbSIsInJvbGUiOiJidXllciIsImlhdCI6MTc0ODc0OTQwNywiZXhwIjoxNzY0MzAxNDA3fQ.H5Zy_L3hgFTV-lzjoUzEnW523EhRTqFOMXT1AYDiPjU"
+const val token ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoiY2F0dGxleWExNzI0QGdtYWlsLmNvbSIsInJvbGUiOiJidXllciIsImlhdCI6MTc0ODgzMTk4MiwiZXhwIjoxNzY0MzgzOTgyfQ.QSD6IKDSNWT9jniEMOPLbh0x3j_UQ32F2rt5af4ey2g"
 class MainActivity : ComponentActivity() {
     private val userViewModel: UserViewModel by viewModels { UserViewModelFactory(this) }
 

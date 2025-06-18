@@ -10,7 +10,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface MenuApiService {
-    @GET("/menus/{id}")
+    @GET("/menus/get/{id}")
     suspend fun getMenuById(
         @Path("id") id:Int
     ): Response<Menu>
