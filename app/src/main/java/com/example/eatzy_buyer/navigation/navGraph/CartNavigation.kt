@@ -11,7 +11,7 @@ fun NavGraphBuilder.cartGraph(
     composable("cart") {
         CartScreen(
             navController = navController,
-            onCheckoutClick = { order_id ->       // <-- ini harus sesuai tipe Int
+            onCheckoutClick = { order_id ->
                 navController.navigate("confirmation/$order_id")
             }
         )

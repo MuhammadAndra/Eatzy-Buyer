@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Store
+import androidx.compose.material.icons.outlined.RemoveShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +28,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.eatzy_buyer.data.model.Cart
 import com.example.eatzy_buyer.ui.components.BottomNavBar
+import com.example.eatzy_buyer.ui.screen.confirmation.formatRupiah
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,11 +38,10 @@ fun CartScreen(
     viewModel: CartViewModel = viewModel(),
     onCheckoutClick: (Int) -> Unit
 ) {
-    // Observe carts from ViewModel
+
     val cart by viewModel.cart.collectAsState()
 
 
-    // Fetch carts from API once when this screen is launched
     LaunchedEffect(Unit) {
         viewModel.fetchCartFromApi()
     }
@@ -57,14 +58,14 @@ fun CartScreen(
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.White // Ubah warna TopAppBar jadi putih
+                    containerColor = Color.White
                 )
             )
         },
         bottomBar = {
             Surface(
-                color = Color.White, // Ubah warna BottomBar jadi putih
-                ) {
+                color = Color.White,
+            ) {
                 BottomNavBar(navController)
             }
         }
@@ -75,18 +76,46 @@ fun CartScreen(
                 .fillMaxSize()
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-            ) {
-                items(cart) { cart ->
-                    CartCard(cart = cart) { order_id ->
-                        navController.navigate("confirmation/$order_id")
+            if (cart.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.RemoveShoppingCart,
+                            contentDescription = "Keranjang Kosong",
+                            tint = Color(0xCCFC9824),
+                            modifier = Modifier
+                                .size(96.dp)
+                                .padding(bottom = 16.dp)
+                        )
+                        Text(
+                            text = "Keranjang Kosong",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = Color.Gray,
+                            fontWeight = FontWeight.Medium,
+                            lineHeight = 20.sp
+                        )
+                    }
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    items(cart) { cart ->
+                        CartCard(cart = cart) { order_id ->
+                            navController.navigate("confirmation/$order_id")
                         }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                 }
             }
         }
@@ -98,7 +127,7 @@ fun CartScreen(
 @Composable
 fun CartCard(
     cart: Cart,
-    onCheckoutClick: (Int) -> Unit // menerima orderId
+    onCheckoutClick: (Int) -> Unit
 ) {
     val groupedItems = remember(cart.items) {
         cart.items.groupBy { Triple(it.menu_id, it.note ?: "", it.addons.joinToString()) }

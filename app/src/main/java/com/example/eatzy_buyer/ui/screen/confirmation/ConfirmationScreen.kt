@@ -3,6 +3,7 @@ package com.example.eatzy_buyer.ui.screen.confirmation
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,7 +61,7 @@ fun ConfirmationScreen(
     val unitPrice = selectedItem?.menu_price ?: 0.0
     val totalPrice = unitPrice * quantity
 
-    val orangeColor = Color(0xFFF4A623)
+    val orangeColor = Color(0xFFFC9824)
     val unselectedTextColor = Color(0xFF455E84)
 
     LaunchedEffect(order_id) {
@@ -76,7 +77,7 @@ fun ConfirmationScreen(
                     Text(
                         "Konfirmasi Pesanan",
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF455E84) // atau `unselectedTextColor`
+                        color = Color(0xFF455E84)
                     )
                 },
                 navigationIcon = {
@@ -106,7 +107,7 @@ fun ConfirmationScreen(
             Text("Opsi Pemesanan", fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Pesan Sekarang
+
             Button(
                 onClick = {
                     pickedTime = null
@@ -117,7 +118,7 @@ fun ConfirmationScreen(
                 colors = if (isNowSelected)
                     ButtonDefaults.buttonColors(
                         containerColor = orangeColor,
-                        contentColor = Color.White // <- ini kuncinya
+                        contentColor = Color.White
                     )
                 else
                     ButtonDefaults.buttonColors(
@@ -136,7 +137,7 @@ fun ConfirmationScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Pesan untuk Nanti
+
             Button(
                 onClick = {
                     isNowSelected = false
@@ -148,7 +149,7 @@ fun ConfirmationScreen(
                 colors = if (!isNowSelected)
                     ButtonDefaults.buttonColors(
                         containerColor = orangeColor,
-                        contentColor = Color.White // <- ini juga kuncinya
+                        contentColor = Color.White
                     )
                 else
                     ButtonDefaults.buttonColors(
@@ -249,8 +250,6 @@ fun ConfirmationScreen(
         val now = LocalTime.now()
         val minSelectableTime = LocalTime.of(8, 0)
         val maxSelectableTime = LocalTime.of(15, 30)
-
-        // Hitung waktu mulai yang valid (min 5 menit dari sekarang, tapi tidak sebelum 08:00)
         val startTime = if (now.isBefore(minSelectableTime)) {
             minSelectableTime
         } else {
@@ -305,7 +304,7 @@ fun ConfirmationScreen(
                         showBottomSheet = false
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF4A623))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFC9824))
                 ) {
                     Text("Konfirmasi", color = Color.White, fontWeight = FontWeight.Bold)
                 }
@@ -329,7 +328,7 @@ fun MenuDetailCard(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)) // putih #FFFFFF
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF))
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             GlideImage(
@@ -398,7 +397,7 @@ fun PreviewConfirmationScreen() {
     val navController = rememberNavController()
     ConfirmationScreen(
         navController = navController,
-        order_id = 0, // tambahkan order_id supaya kompilasi lancar
+        order_id = 0,
         onOrderClick = {}
     )
 }

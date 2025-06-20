@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.eatzy_buyer.data.model.Confirmation
 import com.example.eatzy_buyer.data.repository.ConfirmationRepository
+import com.example.eatzy_buyer.token
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,8 +18,6 @@ class ConfirmationViewModel : ViewModel() {
     private val _confirmation = MutableStateFlow<Confirmation?>(null)
     val confirmation: StateFlow<Confirmation?> = _confirmation
 
-    private val token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJqYWVAZ21haWwuY29tIiwicm9sZSI6ImJ1eWVyIiwiaWF0IjoxNzQ4NjY4NzAyLCJleHAiOjE3NjQyMjA3MDJ9.qVuuBVMBCGwXE2wuFwZsl1hYoG99EG4ck7tPpNFCFF0"
 
     fun fetchOrderById(orderId: Int) {
         viewModelScope.launch {

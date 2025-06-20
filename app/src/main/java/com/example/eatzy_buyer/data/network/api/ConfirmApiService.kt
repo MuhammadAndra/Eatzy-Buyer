@@ -16,7 +16,7 @@ interface ConfirmApiService {
     @PATCH("confirmation/confirm/{order_id}")
     suspend fun confirmOrder(
         @Path("order_id") order_id: Int,
-        @Query("time") time: String?,    // Kirim waktu pesan untuk nanti, nullable
+        @Query("time") time: String?,
         @Header("Authorization") token: String
     ): Response<Unit>
 
