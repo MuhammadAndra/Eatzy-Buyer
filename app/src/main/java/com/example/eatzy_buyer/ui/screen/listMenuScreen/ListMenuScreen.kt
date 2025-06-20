@@ -176,85 +176,104 @@ fun ListMenuScreen(
                             menu.name.contains(searchQuery, ignoreCase = true)
                         }
                     items(filteredMenus) { menu ->
-                        val count =
-                            order?.orderItem?.count { it.menuId == menu.id }
-                                ?: 0
-                        ElevatedCard(
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier
-                                .background(Color(0XFFFFFFFF))
-                                .fillMaxWidth(),
-
-                            elevation = CardDefaults.cardElevation(3.dp)
-                        ) {
-                            MenuCard(
+                        if (menu.isAvailable) {
+                            val count =
+                                order?.orderItem?.count { it.menuId == menu.id }
+                                    ?: 0
+                            ElevatedCard(
+                                shape = RoundedCornerShape(10.dp),
                                 modifier = Modifier
-                                    .clickable {
-                                        if (count != 0) {
-                                            showBottomSheet = true
-                                            menuIdForBottomSheet = menu.id
-                                        } else {
-                                            onNavigateToAddMenu(
-                                                null, // karena tidak tahu dari kategori mana
-                                                menu.id,
-                                                canteenId,
-                                                order?.id,
-                                                null,
-                                                null,
-                                                listOf()
-                                            )
-                                        }
-                                    }
-                                    .padding(13.dp),
-                                menu = menu,
-                                onNavigateToAddMenu = {
-                                    onNavigateToAddMenu(
-                                        null,
-                                        menu.id,
-                                        canteenId,
-                                        order?.id,
-                                        null,
-                                        null,
-                                        listOf()
-                                    )
-                                },
-                                onAddToFavorite = {
-                                    onAddToFavorite(menu.id)
+                                    .background(Color(0XFFFFFFFF))
+                                    .fillMaxWidth(),
 
-                                },
-                                count = if (count > 0) count else null,
-                                onIncrement = { showBottomSheet = true },
-                                onDecrement = { }
-                            )
+                                elevation = CardDefaults.cardElevation(3.dp)
+                            ) {
+                                MenuCard(
+                                    modifier = Modifier
+                                        .clickable {
+                                            if (count != 0) {
+                                                showBottomSheet = true
+                                                menuIdForBottomSheet = menu.id
+                                            } else {
+                                                onNavigateToAddMenu(
+                                                    null, // karena tidak tahu dari kategori mana
+                                                    menu.id,
+                                                    canteenId,
+                                                    order?.id,
+                                                    null,
+                                                    null,
+                                                    listOf()
+                                                )
+                                            }
+                                        }
+                                        .padding(13.dp),
+                                    menu = menu,
+                                    onNavigateToAddMenu = {
+                                        onNavigateToAddMenu(
+                                            null,
+                                            menu.id,
+                                            canteenId,
+                                            order?.id,
+                                            null,
+                                            null,
+                                            listOf()
+                                        )
+                                    },
+                                    onAddToFavorite = {
+                                        onAddToFavorite(menu.id)
+
+                                    },
+                                    count = if (count > 0) count else null,
+                                    onIncrement = { showBottomSheet = true },
+                                    onDecrement = { }
+                                )
+                            }
                         }
                     }
                 } else {
                     menuCategories.forEach { categoryMenu ->
-                        item {
-                            MenuCategoryCard(category = categoryMenu) {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                                ) {
-                                    categoryMenu.menus.forEach { menu ->
-                                        var count by remember {
-                                            mutableIntStateOf(
-                                                0
-                                            )
-                                        }
-                                        if (order != null) {
-                                            count =
-                                                order!!.orderItem.count { orderItem ->
-                                                    orderItem.menuId == menu.id
+                        if (categoryMenu.   menus.first().isAvailable) {
+                            item {
+                                MenuCategoryCard(category = categoryMenu) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    ) {
+                                        categoryMenu.menus.forEach { menu ->
+                                            if (menu.isAvailable) {
+                                                var count by remember {
+                                                    mutableIntStateOf(
+                                                        0
+                                                    )
                                                 }
-                                        }
-                                        MenuCard(
-                                            modifier = Modifier
-                                                .clickable {
-                                                    if (count != 0) {
-                                                        showBottomSheet = true
-                                                        menuIdForBottomSheet =
-                                                            menu.id
-                                                    } else {
+                                                if (order != null) {
+                                                    count =
+                                                        order!!.orderItem.count { orderItem ->
+                                                            orderItem.menuId == menu.id
+                                                        }
+                                                }
+                                                MenuCard(
+                                                    modifier = Modifier
+                                                        .clickable {
+                                                            if (count != 0) {
+                                                                showBottomSheet = true
+                                                                menuIdForBottomSheet =
+                                                                    menu.id
+                                                            } else {
+                                                                onNavigateToAddMenu(
+                                                                    categoryMenu.id,
+                                                                    menu.id,
+                                                                    canteenId,
+                                                                    order?.id,
+                                                                    null,
+                                                                    null,
+                                                                    listOf()
+                                                                )
+                                                            }
+                                                        }
+                                                        .padding(horizontal = 13.dp)
+                                                        .padding(bottom = if (menu == categoryMenu.menus.last()) 13.dp else 0.dp),
+                                                    menu = menu,
+                                                    onNavigateToAddMenu = {
                                                         onNavigateToAddMenu(
                                                             categoryMenu.id,
                                                             menu.id,
@@ -264,34 +283,21 @@ fun ListMenuScreen(
                                                             null,
                                                             listOf()
                                                         )
-                                                    }
-                                                }
-                                                .padding(horizontal = 13.dp)
-                                                .padding(bottom = if (menu == categoryMenu.menus.last()) 13.dp else 0.dp),
-                                            menu = menu,
-                                            onNavigateToAddMenu = {
-                                                onNavigateToAddMenu(
-                                                    categoryMenu.id,
-                                                    menu.id,
-                                                    canteenId,
-                                                    order?.id,
-                                                    null,
-                                                    null,
-                                                    listOf()
+                                                    },
+                                                    onAddToFavorite = { onAddToFavorite(menu.id) },
+                                                    count = if (count > 0) count else null,
+                                                    onIncrement = {
+                                                        showBottomSheet = true
+                                                    },
+                                                    onDecrement = { if (count > 1) count-- }
                                                 )
-                                            },
-                                            onAddToFavorite = { onAddToFavorite(menu.id) },
-                                            count = if (count > 0) count else null,
-                                            onIncrement = {
-                                                showBottomSheet = true
-                                            },
-                                            onDecrement = { if (count > 1) count-- }
-                                        )
-                                        if (menu != categoryMenu.menus.last()) {
-                                            HorizontalDivider(
-                                                thickness = 0.2.dp,
-                                                color = Color(0XFF000000)
-                                            )
+                                                if (menu != categoryMenu.menus.last()) {
+                                                    HorizontalDivider(
+                                                        thickness = 0.2.dp,
+                                                        color = Color(0XFF000000)
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 }

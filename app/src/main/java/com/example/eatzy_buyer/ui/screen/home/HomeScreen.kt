@@ -79,12 +79,14 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 items(canteens) { canteen ->
-                    CanteenCard(
-                        modifier = Modifier.clickable {
-                            onNavigateToListMenuScreen(canteen.id)
-                        },
-                        canteen = canteen,
-                    )
+                    if(canteen.isOpen){
+                        CanteenCard(
+                            modifier = Modifier.clickable {
+                                onNavigateToListMenuScreen(canteen.id)
+                            },
+                            canteen = canteen,
+                        )
+                    }
                 }
             }
         }
